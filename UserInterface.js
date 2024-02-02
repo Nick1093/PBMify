@@ -51,3 +51,25 @@ function showPopupMessage(message, duration = 5000) {
         document.body.removeChild(popup);
     }, duration);
 }
+
+function openFileInput() {
+    document.getElementById('photoInput').click();
+  }
+  
+  function displaySelectedPhoto(input) {
+    const file = input.files[0];
+  
+    if (file) {
+      const reader = new FileReader();
+  
+      reader.onload = function (e) { 
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.style.maxWidth = '100%';
+        document.body.appendChild(img);
+      };
+  
+      reader.readAsDataURL(file);
+    }
+  }
+  
