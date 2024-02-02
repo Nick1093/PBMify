@@ -26,7 +26,21 @@
             z-index: 999;
             opacity: 1;
         }
+
+        #photoInput {
+            display: none;
+            visibility: hidden;
+        }
+
+        #addPhotoBtn {
+            padding: 10px 15px;
+            background-color: #3498db;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+        }
     </style>
+
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -41,59 +55,10 @@
     <h1 style="text-align: center;"><span style="color: lightgray;"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Tilt+Warp&display=swap" rel="stylesheet">Drag and Drop Your Photo</span></h1>
 </div>
 
-<button id="addPhotoButton" onclick="openFilePicker()">Add Photo</button>
+<input type="file" id="photoInput" accept="image/*" onchange="displaySelectedPhoto(this)">
+<button id="addPhotoBtn" onclick="openFileInput()">Add Photo</button>
 
-<script>
-    function allowDrop(event) {
-        event.preventDefault();
-    }
-
-    function drop(event) {
-        event.preventDefault();
-
-        const dropZone = document.getElementById('dropZone');
-        const files = event.dataTransfer.files;
-
-        if (files.length > 0) {
-            const file = files[0];
-
-            if (file.type.startsWith('image/')) {
-                const reader = new FileReader();
-
-                reader.onload = function (e) {
-                    dropZone.innerHTML = `<img src="${e.target.result}" alt="Dropped Image" style="max-width: 100%; max-height: 100%;">`;
-
-                    showPopupMessage('Your photo is added');
-                };
-
-                reader.readAsDataURL(file);
-            } else {
-                alert('Please drop an image file.');
-            }
-        }
-    }
-
-    function showPopupMessage(message, duration = 5000) {
-    const popup = document.createElement('div');
-    popup.className = 'popup';
-    popup.textContent = message;
-    document.body.appendChild(popup);
-    
-    popup.offsetHeight;
-
-    popup.style.transition = 'opacity 0.5s ease-in-out';
-    popup.style.opacity = 1;
-
-    setTimeout(() => {
-        popup.style.opacity = 0;
-    }, duration - 500);
-
-    setTimeout(() => {
-        document.body.removeChild(popup);
-    }, duration);
-}
-
-</script>
+<script src="UserInterface.js" defer></script>
 
 </body>
 </html>
