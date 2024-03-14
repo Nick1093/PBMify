@@ -25,6 +25,7 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+          <Route path="/uihome" element={<ProtectedRoute><UserInterface/></ProtectedRoute>}></Route>
         </Routes>
       </AuthContextProvider>
     </>
