@@ -15,6 +15,7 @@ export const AuthContextProvider = ({ children }) => {
 
   // from sign up
   const createUser = (email, password) => {
+
     return createUserWithEmailAndPassword(auth, email, password);
   };
 
