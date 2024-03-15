@@ -48,8 +48,43 @@ export const AuthContextProvider = ({ children }) => {
   };
 
   // from sign in
-  const signIn = (email, password) => {
-    return signInWithEmailAndPassword(auth, email, password);
+  const signIn = async (email, password) => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+      console.log("UserID at signin: ", user.uid); // This is the user's ID
+
+      // check if user does not exist in firestore db
+      const querySnapshot = await getDocs(collection(firestore, "Users"));
+      let userFound = false;
+      querySnapshot.forEach((doc) => {
+        if (doc.id === user.uid) {
+          userFound = true;
+        }
+      });
+
+      // if user does not exist, add user to firestore db with the userID from signIn function
+      if (!userFound) {
+        console.log("User not found in firestore db");
+        await setDoc(doc(firestore, "Users", user.uid), {
+          email: email,
+          password: password,
+        });
+
+        console.log("User was added in firestoredb with ID: ", user.uid);
+      }
+
+      return true;
+    } catch (error) {
+      // Handle Errors here.
+      const errorMessage = error.message;
+      console.log("Error signing in user: ", errorMessage);
+      return errorMessage;
+    }
   };
 
   // logout function
