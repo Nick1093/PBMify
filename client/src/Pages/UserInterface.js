@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-//import './styles.css';
+
+import "../styles/UserInterface.css"
 
 function UserInterface() {
   const [popupMessage, setPopupMessage] = useState('');
@@ -57,6 +58,7 @@ function UserInterface() {
         id="dropZone"
         onDragOver={allowDrop}
         onDrop={drop}
+
         style={{
           width: '600px',
           height: '400px',
@@ -66,6 +68,7 @@ function UserInterface() {
           margin: '20px auto',
         }}
       >
+        
         {imageData ? (
           <img
             src={imageData}
@@ -73,11 +76,27 @@ function UserInterface() {
             style={{ maxWidth: '90%', maxHeight: '90%' }}
           />
         ) : (
-          <h1 style={{ color: 'lightgray' }}>Drag and Drop Your Photo</h1>
+            <h1 style={{ color: 'lightgray' }}>
+            <link rel="preconnect" href="https://fonts.googleapis.com">
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Tilt+Warp&display=swap" rel="stylesheet">
+            Drag and Drop Your Photo
+            </link>
+            </link>
+            </link>
+            </h1>
         )}
       </div>
       <label htmlFor="photoInput" id="addPhotoBtn">
-        Add Photo
+        
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Tilt+Warp&display=swap" rel="stylesheet">
+            Add Photo
+        </link>
+        </link>
+        </link>
+
       </label>
       <input
         type="file"
@@ -87,7 +106,13 @@ function UserInterface() {
         style={{ display: 'none' }}
       />
       <button id="removePhotoBtn" onClick={removePhoto}>
-        Remove Photo
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Tilt+Warp&display=swap" rel="stylesheet">
+            Remove Photo
+        </link>
+        </link>
+        </link>
       </button>
       {popupMessage && <div className="popup">{popupMessage}</div>}
     </div>

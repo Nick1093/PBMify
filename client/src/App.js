@@ -8,6 +8,7 @@ import Home from "./Pages/Home";
 import Signup from "./Pages/Signup";
 import Signin from "./Pages/Signin";
 import ProtectedRoute from "./Components/ProtectedRoute";
+import UserInterface from "./Pages/UserInterface";
 
 const App = () => {
   return (
