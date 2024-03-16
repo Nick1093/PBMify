@@ -5,6 +5,7 @@ const Landing = () => {
 
   return <>
     <Navbar></Navbar></>;
+    
 };
 
 export default Landing;
