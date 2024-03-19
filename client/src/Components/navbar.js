@@ -16,7 +16,7 @@ const Navbar = () => {
         <nav className="navBar-nav">
           <ul>
             <li>
-              <Link to="/">Home </Link>{" "}
+              <Link to="/userHome">Home </Link>{" "}
             </li>
             <li>
               {" "}
@@ -34,7 +34,6 @@ const Navbar = () => {
                 <ul className="dropdown-menu">
                   <li>
                     <Link to="/profile">View Profile</Link>
-                    <Link to="/settings">Settings</Link>
                   </li>
                   <li onClick={logout}> Sign Out</li>
                 </ul>

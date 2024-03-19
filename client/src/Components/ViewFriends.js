@@ -3,7 +3,7 @@ import React from 'react';
 const ViewFriends = () => {
     return (
         <div>
-            {/* Your JSX here */}
+            <h1>View Friends</h1>
         </div>
     );
 };

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Settings from '../Components/settings';
 import ViewFriends from '../Components/ViewFriends';
 
 
-function Profile() {
-    const [activeComponent, setActiveComponent] = useState('');
+
+const Profile = () => {
+    const [activeComponent, setActiveComponent] = useState();
 
     const renderComponent = () => {
         switch (activeComponent) {
@@ -24,7 +26,9 @@ function Profile() {
                 <ul>
                     <li onClick={() => setActiveComponent('settings')}>Settings</li>
                     <li onClick={() => setActiveComponent('viewFriends')}>View Friends</li>
-                    <li onClick={logout}> Sign Out</li>
+                    <li>
+                        <Link to="/userHome">Home </Link>{" "}
+                    </li>
                 </ul>
             </nav>
             {renderComponent()}
