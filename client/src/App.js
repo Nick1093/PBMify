@@ -9,6 +9,7 @@ import Signup from "./Pages/Signup";
 import Signin from "./Pages/Signin";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import UserInterface from "./Pages/UserInterface";
+import FriendFeedPage from "./Pages/FriendFeedPage";
 
 const App = () => {
   return (
@@ -19,7 +20,7 @@ const App = () => {
           <Route path="/authentication" element={<Signin />} />
           <Route path="/signup" element={<Signup />} />
           <Route
-            path="/userhome"
+            path="/PBMify"
             element={
               <ProtectedRoute>
                 <UserInterface />
@@ -34,7 +35,15 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-          <Route path="/uihome" element={<ProtectedRoute><UserInterface/></ProtectedRoute>}></Route>
+
+          <Route
+            path="/friendfeed"
+            element={
+              <ProtectedRoute>
+                <FriendFeedPage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </AuthContextProvider>
     </>
