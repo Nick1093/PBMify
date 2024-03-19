@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import PhotoUpload from "../Components/PhotoUpload";
 import Navbar from "../Components/navbar";
+import server from "../server/server";
 
 import "../styles/UserInterface.css"
 
 const UserInterface = () => {
   const [popupMessage, setPopupMessage] = useState('');
   const [imageData, setImageData] = useState('');
+  const [successMessage, setSuccessMsg] = useState('');
 
   function allowDrop(event) {
     event.preventDefault();
@@ -53,6 +55,53 @@ const UserInterface = () => {
     setImageData('');
     setPopupMessage('Your photo is removed');
   }
+
+  
+  const saveImage = async () => {
+
+    const getUserId = (req) => {
+      return req.session.userId;
+    }
+
+    const getImage = (req) => {
+      return req.session.image;
+    }
+
+    const getTitle = (req) => {
+      return req.session.title;
+    }
+
+    try {
+      const userId = getUserId();
+      const image = getImage();
+      const title = getTitle();
+
+      const formData = new FormData();
+      formData.append('userId', userId);
+      formData.append('image', image);
+      formData.append('title', title);
+  
+      const response = await fetch("http://localhost:8001/create-post", {
+        method: "POST",
+        body: formData,
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to save image. Please try again.");
+      }
+  
+      const successMessage = await response.json();
+      if (successMessage.message === "Post added successfully") {
+        setSuccessMsg("Image saved successfully to user's profile.");
+      } else {
+        throw new Error("Failed to save image. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error saving image:", error.message);
+      setSuccessMsg("Failed to save image. Please try again.");
+    }
+  };
+
 
   return (
     <div className="container">
@@ -104,6 +153,7 @@ const UserInterface = () => {
         Add Photo
 
       </label>
+
       <input
         type="file"
         id="photoInput"
@@ -122,8 +172,15 @@ const UserInterface = () => {
         Remove Photo
       </button>
       {popupMessage && <div className="popup">{popupMessage}</div>}
+
+      <button onClick={saveImage}>Save Image</button>
+      {successMessage && <div className="saveSuccess">{successMessage}</div>}
+
     </div>
+
+    
   );
+
 }
 
 export default UserInterface;
