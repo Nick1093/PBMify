@@ -76,7 +76,7 @@ app.post("/create-post", async (req, res) => {
 
 app.get("/fetch-posts", async (req, res) => {
   //get UserID
-  const { userID } = req.body;
+  const { userID } = req.query;
   console.log("userID:", userID);
   console.log("---------------------------");
 
