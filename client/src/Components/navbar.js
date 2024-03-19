@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { UserAuth } from "../Context/AuthContext";
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { UserAuth } from "../Context/AuthContext";
 
 const Navbar = () => {
     const { user } = UserAuth();
