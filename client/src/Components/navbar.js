@@ -33,7 +33,8 @@ const Navbar = () => {
               {dropdownOpen ? (
                 <ul className="dropdown-menu">
                   <li>
-                    <Link to="/profile">Profile</Link>
+                    <Link to="/profile">View Profile</Link>
+                    <Link to="/settings">Settings</Link>
                   </li>
                   <li onClick={logout}> Sign Out</li>
                 </ul>
