@@ -70,7 +70,6 @@ app.post("/create-post", async (req, res) => {
   }
 });
 
-
 app.get("/fetch-posts", async (req, res) => {
   //get UserID
   const { userID } = req.body;
@@ -86,16 +85,12 @@ app.get("/fetch-posts", async (req, res) => {
 
   try {
     if (!userDoc.exists) {
-      console.log("Used document not found", userId);
-      res
-        .status(201)
-        .send({ message: "User not found", userId: userId });
+      console.log("Used document not found", userID);
+      res.status(201).send({ message: "User not found", userID: userID });
     }
 
     //get all friends list, why might I use await
-    const friends = await userDoc.data()
-
-      .friends || [];
+    const friends = (await userDoc.data().friends) || [];
     //array to store friends
     let allPosts = [];
 
@@ -106,17 +101,16 @@ app.get("/fetch-posts", async (req, res) => {
 
       if (friendDoc.exists) {
         // Retrieve the posts array from the friend document
-        const friendPosts = await friendDoc.data().posts || [];
+        const friendPosts = (await friendDoc.data().posts) || [];
 
         // Add the friend's posts to the allPosts array
         allPosts = allPosts.concat(friendPosts);
-      } else { // if not work
+      } else {
+        // if not work
         console.log(`Friend document for user ${friendId} does not exist`);
       }
     }
-    res
-      .status(201)
-      .send(allPosts);
+    res.status(201).send(allPosts);
   } catch (error) {
     console.error("Error adding post to user:", error);
     // If the document does not exist, it means the user ID is invalid or not found

@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+
+import Navbar from "../Components/navbar";
 
 const PhotoUpload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -28,42 +30,49 @@ const PhotoUpload = () => {
   };
 
   return (
-    <div>
-      <input type="file" onChange={fileChange} />
-      <div
-        onDragOver={dragOver}
-        onDrop={drop}
-        style={{ border: '2px dashed #ccc', padding: '20px', marginTop: '20px' }}
-      >
-        {selectedFile ? (
-          <img
-            src={URL.createObjectURL(selectedFile)}
-            alt="Selected"
-            style={{ maxWidth: '100%', maxHeight: '100%' }}
-          />
-        ) : (
-          <p>Select your photo here.</p>
-        )}
-      </div>
-      {showMessage && (
+    <>
+      <Navbar></Navbar>
+      <div>
+        <input type="file" onChange={fileChange} />
         <div
+          onDragOver={dragOver}
+          onDrop={drop}
           style={{
-            position: 'fixed',
-            top: '20px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            background: '#87CEEB',
-            color: '#fff',
-            padding: '10px',
-            borderRadius: '5px',
-            boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)',
-            zIndex: 9999,
+            border: "2px dashed #ccc",
+            padding: "20px",
+            marginTop: "20px",
           }}
         >
-          Your photo is added!
+          {selectedFile ? (
+            <img
+              src={URL.createObjectURL(selectedFile)}
+              alt="Selected"
+              style={{ maxWidth: "100%", maxHeight: "100%" }}
+            />
+          ) : (
+            <p>Select your photo here.</p>
+          )}
         </div>
-      )}
-    </div>
+        {showMessage && (
+          <div
+            style={{
+              position: "fixed",
+              top: "20px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              background: "#87CEEB",
+              color: "#fff",
+              padding: "10px",
+              borderRadius: "5px",
+              boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+              zIndex: 9999,
+            }}
+          >
+            Your photo is added!
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 
