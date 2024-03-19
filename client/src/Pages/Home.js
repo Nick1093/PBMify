@@ -1,7 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { UserAuth } from "../Context/AuthContext";
-import FriendFeed from "../Components/friendfeed";
 
 const Home = () => {
   const { user, logout } = UserAuth();
@@ -22,8 +21,6 @@ const Home = () => {
       <p>User email: {user && user.email}</p>
       <button onClick={handleLogout}>Logout</button>
       <h1><br></br>See what your friends are up to</h1>
-
-      <FriendFeed />
 
     </>
   );

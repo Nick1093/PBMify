@@ -8,8 +8,6 @@ const FriendFeed = ({ currentUserID }) => {
     useEffect(() => {
         const fetchFriendPosts = async () => {
             try {
-                if(!user) return;
-
                 // Fetch friends list for the current user
                 const response = await fetch("http://localhost:8001/fetch-posts", {
                     method: "POST",
@@ -18,6 +16,9 @@ const FriendFeed = ({ currentUserID }) => {
                     },
                     body: JSON.stringify({ userID: user.uid }),
                 });
+
+                const data = await response.json()
+                console.log(data)
 
                 if(!response.ok) {
                     throw new Error("Failed to fetch friends");

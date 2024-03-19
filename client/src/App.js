@@ -9,6 +9,7 @@ import Signup from "./Pages/Signup";
 import Signin from "./Pages/Signin";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import UserInterface from "./Pages/UserInterface";
+import FriendFeed from "./Pages/FriendFeed";
 
 const App = () => {
   return (
@@ -31,6 +32,14 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/friendfeed"
+            element={
+              <ProtectedRoute>
+                <FriendFeed />
               </ProtectedRoute>
             }
           />
