@@ -16,11 +16,14 @@ const Navbar = () => {
         <nav className="navBar-nav">
           <ul>
             <li>
-              <Link to="/userHome">Home </Link>{" "}
+              <Link to="/home">Home</Link>{" "}
+            </li>
+            <li>
+              <Link to="/friendfeed">Feed</Link>{" "}
             </li>
             <li>
               {" "}
-              <Link to="/UserInterface">PBMify</Link>
+              <Link to="/PBMify">PBMify</Link>
             </li>
             <li>
               {" "}
@@ -46,7 +49,7 @@ const Navbar = () => {
           <ul>
             <li>
               {" "}
-              <Link to="/">Home </Link>{" "}
+              <Link to="/">Home</Link>{" "}
             </li>
             <li>
               {" "}
