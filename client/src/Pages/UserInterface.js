@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import PhotoUpload from "../Components/PhotoUpload";
 import Navbar from "../Components/navbar";
-import server from "../server/server";
+//import server from "../server/server";
 
 import "../styles/UserInterface.css"
 
