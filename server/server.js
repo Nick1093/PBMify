@@ -73,7 +73,6 @@ app.post("/create-post", async (req, res) => {
   }
 });
 
-
 app.get("/fetch-posts", async (req, res) => {
   //get UserID
   const { userID } = req.query;

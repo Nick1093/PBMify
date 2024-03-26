@@ -57,42 +57,23 @@ const UserInterface = () => {
   }
 
   
-  const saveImage = async () => {
-
-    const getUserId = (req) => {
-      return req.session.userId;
-    }
-
-    const getImage = (req) => {
-      return req.session.image;
-    }
-
-    const getTitle = (req) => {
-      return req.session.title;
-    }
-
+  /*const saveImage = async () => {
     try {
-      const userId = getUserId();
-      const image = getImage();
-      const title = getTitle();
-
       const formData = new FormData();
-      formData.append('userId', userId);
-      formData.append('image', image);
-      formData.append('title', title);
-  
-      const response = await fetch("http://localhost:8001/create-post", {
+      formData.append('image', imageData);
+
+      const response = await fetch("http://localhost:8001/upload-image", {
         method: "POST",
         body: formData,
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to save image. Please try again.");
       }
-  
+
       const successMessage = await response.json();
-      if (successMessage.message === "Post added successfully") {
-        setSuccessMsg("Image saved successfully to user's profile.");
+      if (successMessage.message === "Image saved successfully") {
+        setSuccessMsg("Image saved successfully.");
       } else {
         throw new Error("Failed to save image. Please try again.");
       }
@@ -100,8 +81,7 @@ const UserInterface = () => {
       console.error("Error saving image:", error.message);
       setSuccessMsg("Failed to save image. Please try again.");
     }
-  };
-
+  };*/
 
   return (
     <div className="container">
