@@ -24,6 +24,7 @@ const Profile = () => {
             <h1>Profile Page</h1>
             <nav className="profile-navbar">
                 <ul>
+                    <li onClick={() => setActiveComponent('posts')}>Profile</li>
                     <li onClick={() => setActiveComponent('settings')}>Settings</li>
                     <li onClick={() => setActiveComponent('viewFriends')}>View Friends</li>
                     <li>

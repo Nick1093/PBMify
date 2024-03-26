@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import PhotoUpload from "../Components/PhotoUpload";
 import Navbar from "../Components/navbar";
-import server from "../server/server";
+//import server from "../server/server";
 
 import "../styles/UserInterface.css"
 
@@ -56,7 +56,7 @@ const UserInterface = () => {
     setPopupMessage('Your photo is removed');
   }
 
-  
+
   const saveImage = async () => {
 
     const getUserId = (req) => {
@@ -80,16 +80,16 @@ const UserInterface = () => {
       formData.append('userId', userId);
       formData.append('image', image);
       formData.append('title', title);
-  
+
       const response = await fetch("http://localhost:8001/create-post", {
         method: "POST",
         body: formData,
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to save image. Please try again.");
       }
-  
+
       const successMessage = await response.json();
       if (successMessage.message === "Post added successfully") {
         setSuccessMsg("Image saved successfully to user's profile.");
@@ -119,7 +119,7 @@ const UserInterface = () => {
           margin: '20px auto',
         }}
       >
-        
+
         {imageData ? (
           <img
             src={imageData}
@@ -127,22 +127,22 @@ const UserInterface = () => {
             style={{ maxWidth: '90%', maxHeight: '90%' }}
           />
         ) : (
-            <>
+          <>
             <h1 style={{ color: 'lightgray' }}>
-            {/* <link rel="preconnect" href="https://fonts.googleapis.com">
+              {/* <link rel="preconnect" href="https://fonts.googleapis.com">
             <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> */}
-            {/* <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Tilt+Warp&display=swap" rel="stylesheet"> */}
-            Drag and Drop Your Photo
-            {/* </link>
+              {/* <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Tilt+Warp&display=swap" rel="stylesheet"> */}
+              Drag and Drop Your Photo
+              {/* </link>
             </link>
             </link> */}
             </h1>
-            </>
-            
+          </>
+
         )}
       </div>
       <label htmlFor="photoInput" id="addPhotoBtn">
-        
+
         {/* <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Tilt+Warp&display=swap" rel="stylesheet">
@@ -178,7 +178,7 @@ const UserInterface = () => {
 
     </div>
 
-    
+
   );
 
 }
