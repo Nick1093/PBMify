@@ -51,115 +51,117 @@ const UserInterface = () => {
     }
   }
 
+  function convertImageToMatrix(imageData) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            const imageData = ctx.getImageData(0, 0, img.width, img.height).data;
+            const matrix = [];
+            for (let y = 0; y < img.height; y++) {
+                const row = [];
+                for (let x = 0; x < img.width; x++) {
+                    const index = (y * img.width + x) * 4;
+                    // Extract RGB values and calculate grayscale value
+                    const grayscale = (imageData[index] + imageData[index + 1] + imageData[index + 2]) / 3;
+                    // Normalize grayscale value to range [0, 1]
+                    const normalized = grayscale / 255;
+                    row.push(normalized);
+                }
+                matrix.push(row);
+            }
+            resolve(matrix);
+        };
+        img.onerror = function(error) {
+            reject(error);
+        };
+        img.src = imageData;
+    });
+  }
+
   function removePhoto() {
     setImageData('');
     setPopupMessage('Your photo is removed');
   }
 
-  
-  /*const saveImage = async () => {
-    try {
-      const formData = new FormData();
-      formData.append('image', imageData);
-
-      const response = await fetch("http://localhost:8001/upload-image", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to save image. Please try again.");
-      }
-
-      const successMessage = await response.json();
-      if (successMessage.message === "Image saved successfully") {
-        setSuccessMsg("Image saved successfully.");
-      } else {
-        throw new Error("Failed to save image. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error saving image:", error.message);
-      setSuccessMsg("Failed to save image. Please try again.");
-    }
-  };*/
-
   return (
     <div className="container">
-      <div
-        id="dropZone"
-        onDragOver={allowDrop}
-        onDrop={drop}
-
-        style={{
-          width: '600px',
-          height: '400px',
-          border: '2px dashed #aaa',
-          textAlign: 'center',
-          lineHeight: '380px',
-          margin: '20px auto',
-        }}
-      >
-        
-        {imageData ? (
-          <img
-            src={imageData}
-            alt="Your Image"
-            style={{ maxWidth: '90%', maxHeight: '90%' }}
-          />
-        ) : (
-            <>
-            <h1 style={{ color: 'lightgray' }}>
+        <div
+            id="dropZone"
+            onDragOver={allowDrop}
+            onDrop={drop}
+            style={{
+                width: '600px',
+                height: '400px',
+                border: '2px dashed #aaa',
+                textAlign: 'center',
+                lineHeight: '380px',
+                margin: '20px auto',
+            }}
+        >
+            {imageData ? (
+                <img
+                    src={imageData}
+                    alt="Your Image"
+                    style={{ maxWidth: '90%', maxHeight: '90%' }}
+                />
+            ) : (
+                <>
+                    <h1 style={{ color: 'lightgray' }}>
+                        {/* <link rel="preconnect" href="https://fonts.googleapis.com">
+                        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> */}
+                        {/* <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Tilt+Warp&display=swap" rel="stylesheet"> */}
+                        Drag and Drop Your Photo
+                        {/* </link>
+                        </link>
+                        </link> */}
+                    </h1>
+                </>
+            )}
+        </div>
+        <label htmlFor="photoInput" id="addPhotoBtn">
             {/* <link rel="preconnect" href="https://fonts.googleapis.com">
-            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> */}
-            {/* <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Tilt+Warp&display=swap" rel="stylesheet"> */}
-            Drag and Drop Your Photo
-            {/* </link>
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Tilt+Warp&display=swap" rel="stylesheet">
+                Add Photo
+            </link>
             </link>
             </link> */}
-            </h1>
-            </>
-            
-        )}
-      </div>
-      <label htmlFor="photoInput" id="addPhotoBtn">
-        
-        {/* <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Tilt+Warp&display=swap" rel="stylesheet">
             Add Photo
-        </link>
-        </link>
-        </link> */}
-        Add Photo
-
-      </label>
-
-      <input
-        type="file"
-        id="photoInput"
-        accept="image/*"
-        onChange={displaySelectedPhoto}
-        style={{ display: 'none' }}
-      />
-      <button id="removePhotoBtn" onClick={removePhoto}>
-        {/* <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Tilt+Warp&display=swap" rel="stylesheet">
+        </label>
+        <input
+            type="file"
+            id="photoInput"
+            accept="image/*"
+            onChange={displaySelectedPhoto}
+            style={{ display: 'none' }}
+        />
+        <button id="removePhotoBtn" onClick={removePhoto}>
+            {/* <link rel="preconnect" href="https://fonts.googleapis.com">
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Tilt+Warp&display=swap" rel="stylesheet">
+                Remove Photo
+            </link>
+            </link>
+            </link> */}
             Remove Photo
-        </link>
-        </link>
-        </link> */}
-        Remove Photo
-      </button>
-      {popupMessage && <div className="popup">{popupMessage}</div>}
-
-      <button onClick={saveImage}>Save Image</button>
-      {successMessage && <div className="saveSuccess">{successMessage}</div>}
-
+        </button>
+        {popupMessage && <div className="popup">{popupMessage}</div>}
+        <button onClick={saveImage}>Save Image</button>
+        {successMessage && <div className="saveSuccess">{successMessage}</div>}
+        {imageData && (
+            <div>
+                <button onClick={convertAndDisplayMatrix}>Convert and Display Matrix</button>
+                <pre>{JSON.stringify(matrix, null, 2)}</pre>
+            </div>
+        )}
     </div>
+);
 
-    
-  );
 
 }
 
