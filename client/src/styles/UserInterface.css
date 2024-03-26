@@ -1,0 +1,30 @@
+/*h1, label, button {
+    font-family: 'Climate Crisis', cursive;
+    font-family: 'Tilt Warp', cursive;
+}
+*/
+
+.popup {
+    background-color: #4CAF50;
+    color: #fff;
+    padding: 10px;
+    position: absolute;
+    top: calc(90%);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    border-radius: 5px;
+    z-index: 999;
+}
+
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+
+
