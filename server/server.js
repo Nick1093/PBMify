@@ -76,6 +76,35 @@ app.post("/create-post", async (req, res) => {
   }
 });
 
+app.get("/my-posts", async (req, res) => {
+  // Get the user ID from the query string
+  const { userId } = req.query;
+  console.log("userId:", userId);
+
+  // Reference to the 'Users' collection
+  const users = db.collection("Users");
+
+  // The document reference for the user
+  const userDoc = users.doc(userId);
+
+  try {
+    // Get the user document
+    const doc = await userDoc.get();
+
+    if (!doc.exists) {
+      console.log("User document not found", userId);
+      res.status(404).send({ message: "User not found", userId: userId });
+    } else {
+      // Get the posts array from the user document
+      const posts = doc.data().posts || [];
+
+      res.status(200).send({ "imageURL": posts });
+    }
+  } catch (error) {
+    console.error("Error getting posts:", error);
+    res.status(500).send("An error occurred");
+  }
+});
 
 app.get("/fetch-posts", async (req, res) => {
   //get UserID
