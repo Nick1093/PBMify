@@ -25,6 +25,7 @@ const Home = () => {
       <button onClick={handleLogout}>Logout</button>
       <h1><br></br>See what your friends are up to</h1>
       <FriendFeedComponent></FriendFeedComponent>
+      <h1>Ignore this Jessica is Testing</h1>
     </>
   );
 };
