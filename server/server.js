@@ -1,3 +1,4 @@
+const { v4: uuidv4 } = require('uuid');
 // Step 4: Set up a basic server with Express.js
 const express = require("express");
 const cors = require("cors");
@@ -24,6 +25,7 @@ app.use(express.json());
 const admin = require('firebase-admin');
 
 const serviceAccount = require('./service-account-file.json');
+const { UUID } = require("mongodb");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
@@ -36,10 +38,43 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
+app.post("/remove-post", async (req, res) => {
+  // Get data from the front end
+  const { userId, postID } = req.body; // Assuming you're sending a title along with userId and image
+
+  // Reference to the 'Users' collection
+  const users = db.collection("Users").doc(userId);
+
+
+  try {
+    // Update the user's document by removing the post from the posts array
+    await users.update({
+      posts: FieldValue.arrayRemove(postID)
+    });
+
+
+    console.log("Post removed from user", userId);
+    res
+      .status(201)
+      .send({ message: "Post removed successfully", userId: userId });
+
+  } catch (error) {
+    console.error("Error removing post from user:", error);
+    // If the document does not exist, it means the user ID is invalid or not found
+    if (error.code === 5) {
+      // Firestore's error code for not found documents
+      res.status(404).send("User not found");
+    } else {
+      res.status(500).send("Error removing post from user");
+    }
+  }
+});
+
+
 // Create a new post
 app.post("/create-post", async (req, res) => {
   // Get data from the front end
-  const { userId, image, title } = req.body; // Assuming you're sending a title along with userId and image
+  const { userId, imageURL, title } = req.body; // Assuming you're sending a title along with userId and image
 
   // Reference to the 'Users' collection
   const users = db.collection("Users");
@@ -49,9 +84,10 @@ app.post("/create-post", async (req, res) => {
 
   // Create the post object to be added
   const newPost = {
-    image,
+    imageURL,
     title,
     createdAt: admin.firestore.FieldValue.serverTimestamp(), // Automatically generate a server-side timestamp
+    PostID: uuidv4() // generate UUID for the post
   };
 
   try {
@@ -106,7 +142,7 @@ app.get("/my-posts", async (req, res) => {
   }
 });
 
-app.get("/fetch-posts", async (req, res) => {
+app.get("/fetch-posts", async (req, res) => { // get friends posts
   //get UserID
   const { userID } = req.query;
   console.log("userID:", userID);
@@ -195,6 +231,8 @@ app.get("/get-friends", async (req, res) => {
     res.status(500).send("An error occurred");
   }
 });
+
+
 
 // Step 5: Start your server
 app.listen(port, () => {
