@@ -26,5 +26,44 @@
     margin: 0;
 }
 
+.addPhoto {
+    background-color: rgb(49, 169, 216);
+    color: #fff;
+    padding: 5px;
+    position: absolute;
+    top: calc(40%);
+    left: 80%;
+    transform: translateX(-50%);
+    width: 120px;
+    border-radius: 5px;
+    text-align: center;
+    border-style:double;
+}
 
+
+.removePhoto {
+    background-color: darkgray;
+    color: #fff;
+    padding: 5px;
+    position: absolute;
+    top: calc(50%);
+    left: 80%;
+    transform: translateX(-50%);
+    width: 130px;
+    border-radius: 5px;
+    border-style:dotted;
+}
+
+.savePhoto {
+    background-color: skyblue;
+    color: #fff;
+    padding: 5px;
+    position: absolute;
+    top: calc(45%);
+    left: 80%;
+    transform: translateX(-50%);
+    width: 130px;
+    border-radius: 5px;
+    border-style:dotted;
+}
 
