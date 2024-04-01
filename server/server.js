@@ -21,12 +21,15 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 // ---------------------------------- Initialize Firebase Admin SDK ----------------------------------
+const admin = require('firebase-admin');
+
 const serviceAccount = require('./service-account-file.json');
-initializeApp({
-  credential: cert(serviceAccount)
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
 });
 
-const db = getFirestore();
+const db = admin.firestore();
 // ----------------------------------------------------------------------------------------------------
 
 app.get("/", (req, res) => {
@@ -73,6 +76,39 @@ app.post("/create-post", async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
+=======
+app.get("/my-posts", async (req, res) => {
+  // Get the user ID from the query string
+  const { userId } = req.query;
+  console.log("userId:", userId);
+
+  // Reference to the 'Users' collection
+  const users = db.collection("Users");
+
+  // The document reference for the user
+  const userDoc = users.doc(userId);
+
+  try {
+    // Get the user document
+    const doc = await userDoc.get();
+
+    if (!doc.exists) {
+      console.log("User document not found", userId);
+      res.status(404).send({ message: "User not found", userId: userId });
+    } else {
+      // Get the posts array from the user document
+      const posts = doc.data().posts || [];
+
+      res.status(200).send({ "imageURL": posts });
+    }
+  } catch (error) {
+    console.error("Error getting posts:", error);
+    res.status(500).send("An error occurred");
+  }
+});
+
+>>>>>>> a7b3b45c0e1ab519429d98290a87b0e2e6024a7c
 app.get("/fetch-posts", async (req, res) => {
   //get UserID
   const { userID } = req.query;
@@ -104,7 +140,7 @@ app.get("/fetch-posts", async (req, res) => {
     console.log("YEEEEEHAW");
 
 
-    
+
     //array to store friends
     let allPosts = [];
 
@@ -135,6 +171,31 @@ app.get("/fetch-posts", async (req, res) => {
     } else {
       res.status(500).send("Error finding friends post");
     }
+  }
+});
+
+app.get("/get-friends", async (req, res) => {
+  //get UserID
+  const { userID } = req.query;
+  console.log("userID:", userID);
+  console.log("---------------------------");
+  //connect to firestore
+
+  //Reference the 'Users' collection
+  const userDoc = db.collection("Users").doc(userID);
+  const docSnapshot = await userDoc.get();
+
+  try {
+    if (!docSnapshot.exists) {
+      console.log("Used document not found", userID);
+      res.status(404).send({ message: "User not found", userID: userID });
+    } else {
+      const friendsArray = docSnapshot.data().friends || [];
+      res.status(200).send(friendsArray);
+    }
+  } catch (error) {
+    console.error("error getting posts:", error);
+    res.status(500).send("An error occurred");
   }
 });
 
