@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { UserAuth } from "../Context/AuthContext";
 
 const Navbar = () => {
@@ -36,7 +36,7 @@ const Navbar = () => {
               {dropdownOpen ? (
                 <ul className="dropdown-menu">
                   <li>
-                    <Link to="/profile">Profile</Link>
+                    <Link to="/profile">View Profile</Link>
                   </li>
                   <li onClick={logout}> Sign Out</li>
                 </ul>

@@ -10,6 +10,8 @@ import Signin from "./Pages/Signin";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import UserInterface from "./Pages/UserInterface";
 import FriendFeedPage from "./Pages/FriendFeedPage";
+import Profile from "./Pages/Profile";
+
 
 const App = () => {
   return (
@@ -19,6 +21,7 @@ const App = () => {
           <Route path="/" exact element={<Landing />} />
           <Route path="/authentication" element={<Signin />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/profile" element={<Profile />} />
           <Route
             path="/PBMify"
             element={
@@ -35,6 +38,7 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/friendfeed"
             element={
