@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { UserAuth } from "../Context/AuthContext";
 
 const Navbar = () => {
@@ -16,11 +16,14 @@ const Navbar = () => {
         <nav className="navBar-nav">
           <ul>
             <li>
-              <Link to="/">Home </Link>{" "}
+              <Link to="/home">Home</Link>{" "}
+            </li>
+            <li>
+              <Link to="/friendfeed">Feed</Link>{" "}
             </li>
             <li>
               {" "}
-              <Link to="/UserInterface">PBMify</Link>
+              <Link to="/PBMify">PBMify</Link>
             </li>
             <li>
               {" "}
@@ -33,7 +36,7 @@ const Navbar = () => {
               {dropdownOpen ? (
                 <ul className="dropdown-menu">
                   <li>
-                    <Link to="/profile">Profile</Link>
+                    <Link to="/profile">View Profile</Link>
                   </li>
                   <li onClick={logout}> Sign Out</li>
                 </ul>
@@ -46,7 +49,7 @@ const Navbar = () => {
           <ul>
             <li>
               {" "}
-              <Link to="/">Home </Link>{" "}
+              <Link to="/">Home</Link>{" "}
             </li>
             <li>
               {" "}

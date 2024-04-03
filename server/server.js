@@ -1,9 +1,15 @@
 // Step 4: Set up a basic server with Express.js
 const express = require("express");
+const cors = require("cors");
 const app = express();
 const port = 8001;
 const bodyParser = require("body-parser");
-const admin = require("firebase-admin");
+const { initializeApp, applicationDefault, cert } = require('firebase-admin/app');
+const { getFirestore, Timestamp, FieldValue, Filter } = require('firebase-admin/firestore');
+
+
+// Use the cors middleware
+app.use(cors());
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -15,12 +21,15 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 // ---------------------------------- Initialize Firebase Admin SDK ----------------------------------
-// You can replace the path with the path to your service account key file
-const serviceAccount = require("./service-account-file.json");
+const admin = require('firebase-admin');
+
+const serviceAccount = require('./service-account-file.json');
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+  credential: admin.credential.cert(serviceAccount)
 });
+
+const db = admin.firestore();
 // ----------------------------------------------------------------------------------------------------
 
 app.get("/", (req, res) => {
@@ -31,9 +40,6 @@ app.get("/", (req, res) => {
 app.post("/create-post", async (req, res) => {
   // Get data from the front end
   const { userId, image, title } = req.body; // Assuming you're sending a title along with userId and image
-
-  // Reference to the Firestore database
-  const db = admin.firestore();
 
   // Reference to the 'Users' collection
   const users = db.collection("Users");
@@ -70,32 +76,74 @@ app.post("/create-post", async (req, res) => {
   }
 });
 
-app.get("/fetch-posts", async (req, res) => {
-  //get UserID
-  const { userID } = req.body;
+app.get("/my-posts", async (req, res) => {
+  // Get the user ID from the query string
+  const { userId } = req.query;
+  console.log("userId:", userId);
 
-  //Reference the Firestore databse
-  const db = admin.firestore();
-
-  //Reference the 'Users' collection
+  // Reference to the 'Users' collection
   const users = db.collection("Users");
 
-  //The document references the user
-  const userDoc = users.doc(userID);
+  // The document reference for the user
+  const userDoc = users.doc(userId);
 
   try {
-    if (!userDoc.exists) {
+    // Get the user document
+    const doc = await userDoc.get();
+
+    if (!doc.exists) {
+      console.log("User document not found", userId);
+      res.status(404).send({ message: "User not found", userId: userId });
+    } else {
+      // Get the posts array from the user document
+      const posts = doc.data().posts || [];
+
+      res.status(200).send({ "imageURL": posts });
+    }
+  } catch (error) {
+    console.error("Error getting posts:", error);
+    res.status(500).send("An error occurred");
+  }
+});
+
+app.get("/fetch-posts", async (req, res) => {
+  //get UserID
+  const { userID } = req.query;
+  console.log("userID:", userID);
+  console.log("---------------------------");
+
+  //Reference the 'Users' collection
+  const userDoc = db.collection("Users").doc(userID);
+
+  //This is the snapshot
+  const docSnapshot = await userDoc.get()
+
+  // console.log("Values of collection:");
+  // console.log(docSnapshot._fieldsProto.friends.arrayValue)
+
+  try {
+    if (!docSnapshot.exists) {
+      console.log("------------------------------");
       console.log("Used document not found", userID);
+      console.log("------------------------------");
       res.status(201).send({ message: "User not found", userID: userID });
     }
 
-    //get all friends list, why might I use await
-    const friends = (await userDoc.data().friends) || [];
+    // Log the entire document data to verify its contents
+    console.log("Document data:", docSnapshot.data());
+
+    // Extract friends array from user document
+    const friendsArray = docSnapshot.data().friends || docSnapshot.get("friends") || [];
+    console.log("YEEEEEHAW");
+
+
+
     //array to store friends
     let allPosts = [];
 
     // Iterate through each friend
-    for (let friendId of friends) {
+    for (let friendId of friendsArray) {
+      console.log("friendId:", friendId)
       // Get the document for the friend
       const friendDoc = await db.collection("Users").doc(friendId).get();
 
@@ -120,6 +168,31 @@ app.get("/fetch-posts", async (req, res) => {
     } else {
       res.status(500).send("Error finding friends post");
     }
+  }
+});
+
+app.get("/get-friends", async (req, res) => {
+  //get UserID
+  const { userID } = req.query;
+  console.log("userID:", userID);
+  console.log("---------------------------");
+  //connect to firestore
+
+  //Reference the 'Users' collection
+  const userDoc = db.collection("Users").doc(userID);
+  const docSnapshot = await userDoc.get();
+
+  try {
+    if (!docSnapshot.exists) {
+      console.log("Used document not found", userID);
+      res.status(404).send({ message: "User not found", userID: userID });
+    } else {
+      const friendsArray = docSnapshot.data().friends || [];
+      res.status(200).send(friendsArray);
+    }
+  } catch (error) {
+    console.error("error getting posts:", error);
+    res.status(500).send("An error occurred");
   }
 });
 
