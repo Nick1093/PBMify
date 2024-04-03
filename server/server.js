@@ -76,8 +76,8 @@ app.post("/create-post", async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
-=======
+//<<<<<<< HEAD
+//=======
 app.get("/my-posts", async (req, res) => {
   // Get the user ID from the query string
   const { userId } = req.query;
@@ -108,7 +108,7 @@ app.get("/my-posts", async (req, res) => {
   }
 });
 
->>>>>>> a7b3b45c0e1ab519429d98290a87b0e2e6024a7c
+//>>>>>>> a7b3b45c0e1ab519429d98290a87b0e2e6024a7c
 app.get("/fetch-posts", async (req, res) => {
   //get UserID
   const { userID } = req.query;
