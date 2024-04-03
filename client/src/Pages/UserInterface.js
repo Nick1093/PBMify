@@ -3,7 +3,6 @@ import PhotoUpload from "../Components/PhotoUpload";
 import Navbar from "../Components/navbar";
 //import server from "../server/server";
 
-
 import "../styles/UserInterface.css"
 
 
@@ -43,32 +42,22 @@ const UserInterface = () => {
    }
  }
 
-// ------------------------------THIS ENTIRE FUNCTION NEVER RUNS
- function displaySelectedPhoto(event) {
-  console.log("displaySelectedPhoto is running now.")
-   const file = event.target.files[0];
 
-   if (file) {
-    console.log("file has occured")
-     const reader = new FileReader();
 
-     reader.onload = function (e) {
-      const img = new Image();
-      img.onload = function() {
-        setPopupMessage('Your photo is added');
-        setImageData({
-          dataUrl: e.target.result,
-          width: img.naturalWidth,
-          height: img.naturalHeight
-        });
-        console.log("height:",img.height)
-        console.log("width:",img.width)
-      };
-      img.src = e.target.result;
-     };
-     reader.readAsDataURL(file);
-   }
- }
+function displaySelectedPhoto(event) {
+  const file = event.target.files[0];
+
+  if (file) {
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+      setPopupMessage('Your photo is added');
+      setImageData(e.target.result);
+    };
+
+    reader.readAsDataURL(file);
+  }
+}
 
 
  function getNearest(palette, col) {
