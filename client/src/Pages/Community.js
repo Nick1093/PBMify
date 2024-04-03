@@ -5,8 +5,7 @@ import { UserAuth } from "../Context/AuthContext";
 const Community = () => {
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [successMessage, setSuccessMessage] = useState(null);
+    const [message, setMessage] = useState(null)
 
     const { user } = UserAuth();
 
@@ -15,7 +14,6 @@ const Community = () => {
     };
 
     const handleAddFriend = async () => {
-        setError(null);
         setLoading(true);
 
         try {
@@ -32,11 +30,13 @@ const Community = () => {
                 throw new Error('Error adding friend. Please try again.');
             }
 
+            const data = await response.json()
+
             setLoading(false);
-            setSuccessMessage('Friend added successfully.');
+            setMessage(data.message);
         } catch (error) {
             setLoading(false);
-            setError(error.message || 'Error adding friend. Please try again.');
+            setMessage(error.message || 'Error adding friend. Please try again.')
         }
     };
 
@@ -52,8 +52,8 @@ const Community = () => {
             <button onClick={handleAddFriend} disabled={loading}>
                 {loading ? 'Adding...' : 'Add Friend'}
             </button>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
+            {message && message.includes("Error") && <p style={{ color: 'red' }}>{message}</p>}
+            {message && !message.includes("Error") && <p style={{ color: 'green' }}>{message}</p>}
         </div>
     );
 }
