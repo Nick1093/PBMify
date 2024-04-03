@@ -105,7 +105,7 @@ app.get("/fetch-posts", async (req, res) => {
     console.log("YEEEEEHAW");
 
 
-    
+
     //array to store friends
     let allPosts = [];
 
@@ -147,8 +147,6 @@ app.post("/add-friend", async (req, res) => {
   try {
 
     console.log(userID, userEmail);
-    // Reference the Firestore database
-    const db = admin.firestore();
 
     // Reference to the 'Users' collection
     const users = db.collection("Users");
@@ -158,6 +156,11 @@ app.post("/add-friend", async (req, res) => {
 
     // Get the current friends list of the initial user
     const initialUserFriends = initialUserDoc.data().friends || [];
+
+    // Check if the friend already exists in the initial user's friends list
+    if (initialUserFriends.some(friend => friend.friendEmail === userEmail)) {
+      return res.status(400).send({ "message": "Friend already exists in the friend list" });
+    }
 
     // Query the collection to find the document with the provided email
     const userSnapshot = await users.where("email", "==", userEmail).get();
@@ -191,10 +194,10 @@ app.post("/add-friend", async (req, res) => {
       // Update the initial user's document with the modified friends list
       await initialUserDoc.ref.update({ friends: initialUserFriends });
     } else {
-      return res.status(400).send("User is already in the friend list");
+      return res.status(400).send({ "message": "User is already in the friend list" });
     }
 
-    res.status(200).send("Friend added successfully");
+    res.status(200).send({ "message": "Friend added successfully" });
   } catch (error) {
     console.error("Error adding friend:", error);
     res.status(500).send("Internal server error");
