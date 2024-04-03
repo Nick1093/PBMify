@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PhotoUpload from "../Components/PhotoUpload";
 import Navbar from "../Components/navbar";
+import { getColourPalette } from "../Components/ColorUtils";
 //import server from "../server/server";
 
 import "../styles/UserInterface.css"
@@ -10,7 +11,44 @@ const UserInterface = () => {
  const [popupMessage, setPopupMessage] = useState('');
  const [imageData, setImageData] = useState({});
  const [successMessage, setSuccessMsg] = useState('');
+ const [paintByNumberImage, setPaintByNumberImage] = useState(null);
 
+ /*useEffect(() => {
+  if (imageData) {
+    generatePaintByNumberImage();
+  }
+}, [imageData]);
+
+const generatePaintByNumberImage = async () => {
+  try {
+    // Get color palette from the uploaded image
+    const palette = await getColourPalette(imageData);
+
+    // Limit palette to 20 colors
+    const limitedPalette = palette.slice(0, 20);
+
+    // Map colors to numbers
+    const colorMap = {};
+    limitedPalette.forEach((color, index) => {
+      colorMap[color] = index + 1; // Assigning numbers starting from 1
+    });
+
+    // Convert image to grid
+    // You can use libraries like canvas or pixel.js to manipulate images in JavaScript
+
+    // Map pixels to numbers based on the color map
+
+    // Display the paint by number image
+    // You can use canvas to draw the paint by number image
+
+    // Example:
+    // const canvas = document.getElementById('paintByNumberCanvas');
+    // const ctx = canvas.getContext('2d');
+    // Draw sections of the image using colors from the palette
+  } catch (error) {
+    console.error("Error generating Paint by Number image:", error);
+  }
+};*/
 
  function allowDrop(event) {
    event.preventDefault();
@@ -75,37 +113,13 @@ function displaySelectedPhoto(event) {
    }
    return nearest;
    };
-
-
-// Right now, imageData is not the type of object we want it to be. It's supposed to be a built-in function from getImageData(), which has
-// the properties height, width, and data (an array). Right now it's something else, so imageData.height, imageData.width, and imageData.data are all undefined.
- function convertImageToMatrix(imageData, palette) {
-  console.log("imageData:", imageData)
-   const mat = [];
-   for (const i = 0; i < imageData.height; i++) {
-     mat[i] = new Array(imageData.width);
-     console.log("for loop, This is running")
-   }
-   console.log("height:", imageData.height)
-
-   for (const i = 0; i < imageData.data.length; i += 4) {
-       const nearestI = getNearest(palette, {
-         r: imageData.data[i],
-         g: imageData.data[i + 1],
-         b: imageData.data[i + 2]
-       });
-       const x = (i / 4) % imageData.width;
-       const y = Math.floor((i / 4) / imageData.width);
-       mat[y][x] = nearestI;
-   }
-   return mat;
- }
-
+   
 
  function removePhoto() {
-   setImageData('');
-   setPopupMessage('Your photo is removed');
- }
+  setImageData('');
+  setPopupMessage('Your photo is removed');
+  document.getElementById("photoInput").value = "";
+}
 
 
   const saveImage = async () => {
@@ -172,7 +186,7 @@ function displaySelectedPhoto(event) {
            {imageData ? (
                <img
                    src={imageData}
-                   alt="Your Image"
+                   alt="Drag and Drop You Photo"
                    style={{ maxWidth: '90%', maxHeight: '90%' }}
                />
            ) : (
@@ -221,8 +235,7 @@ function displaySelectedPhoto(event) {
        {successMessage && <div className="saveSuccess">{successMessage}</div>}
        {imageData && (
            <div>
-               <button onClick={convertImageToMatrix}>Convert and Display Matrix</button>
-               
+              
            </div>
        )}
    </div>
