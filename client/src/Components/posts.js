@@ -9,27 +9,27 @@ const Posts = ({ currentUserID }) => {
     const { user } = UserAuth();
     const [myPosts, setMyPosts] = useState([]);
 
-    useEffect(() => {
-        const fetchMyPosts = async () => {
-            try {
-                console.log("Fetching your posts...");
-                console.log(user.uid)
+    const fetchMyPosts = async () => {
+        try {
+            console.log("Fetching your posts...");
+            console.log(user.uid)
 
-                const response = await fetch(`http://localhost:8001/my-posts?userId=${user.uid}`);
-                const data = await response.json();
+            const response = await fetch(`http://localhost:8001/my-posts?userId=${user.uid}`);
+            const data = await response.json();
 
-                console.log("Response data:", data);
+            console.log("Response data:", data);
 
-                if (!response.ok) {
-                    throw new Error("Failed to fetch your posts");
-                }
-                console.log(data);
-                setMyPosts(data.userImages);
-            } catch (error) {
-                console.error("Error fetching your posts:", error);
+            if (!response.ok) {
+                throw new Error("Failed to fetch your posts");
             }
-        };
 
+            console.log(data);
+            setMyPosts(data.userImages);
+        } catch (error) {
+            console.error("Error fetching your posts:", error);
+        }
+    };
+    useEffect(() => {
         fetchMyPosts();
     }, []);
 
@@ -43,13 +43,13 @@ const Posts = ({ currentUserID }) => {
                 },
                 body: JSON.stringify({ postID: postID, userID: user.uid }),
             });
-
             if (!response.ok) {
                 throw new Error('Failed to delete post');
             }
         } catch (error) {
             console.error('Error:', error);
         }
+        fetchMyPosts();
     };
 
     return (
@@ -59,7 +59,7 @@ const Posts = ({ currentUserID }) => {
                 {myPosts.map((post, index) => (
                     <li key={index}>
                         {<img src={`data:image/jpeg;base64,${post.imageURL}`} alt="post" />}
-                        <button onClick={() => deletePost(post.PostID)} className="myPosts">
+                        <button onClick={() => deletePost(post.postID)} className="myPosts">
                             <FontAwesomeIcon icon={faTrash} />
                         </button>
                     </li>

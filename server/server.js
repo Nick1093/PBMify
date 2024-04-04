@@ -47,13 +47,14 @@ app.get("/", (req, res) => {
 
 app.post("/remove-post", async (req, res) => {
   // Get data from the front end
-  const { userId, postID } = req.body; // Assuming you're sending a title along with userId and image
+  const { userID, postID } = req.body; // Assuming you're sending a title along with userId and image
+  console.log(userID, postID)
 
   // Reference to the 'Users' collection
   const users = db.collection("Users");
 
   // The document reference for the user
-  const userDoc = users.doc(userId);
+  const userDoc = users.doc(userID);
 
   try {
     // Get the user's document
@@ -70,20 +71,21 @@ app.post("/remove-post", async (req, res) => {
     let posts = userDocSnapshot.data().posts;
 
     // Filter out the post with the given postID
-    posts = posts.filter((post) => post.PostID !== postID);
+    posts = posts.filter((post) => post.postID !== postID);
 
     // Update the user's document by setting the posts array
     await userDoc.update({ posts });
 
-    console.log("Post removed from user", userId);
+    console.log("Post removed from user", userID);
     res
       .status(201)
-      .send({ message: "Post removed successfully", userId: userId });
+      .send({ message: "Post removed successfully", userID: userID });
   } catch (error) {
     console.error("Error removing post from user:", error);
     res.status(500).send("Error removing post from user");
   }
 });
+
 // Create a new post
 app.post("/create-post", async (req, res) => {
   // Get data from the front end
@@ -100,7 +102,7 @@ app.post("/create-post", async (req, res) => {
     imageURL,
     title,
     createdAt: admin.firestore.FieldValue.serverTimestamp(), // Automatically generate a server-side timestamp
-    PostID: uuidv4(), // generate UUID for the post
+    postID: uuidv4(), // generate UUID for the post
   };
 
   try {
@@ -125,6 +127,7 @@ app.post("/create-post", async (req, res) => {
   }
 });
 
+
 app.get("/my-posts", async (req, res) => {
   // Get the user ID from the query string
   const { userId } = req.query;
@@ -147,7 +150,7 @@ app.get("/my-posts", async (req, res) => {
       // Get the posts array from the user document
       const posts = doc.data().posts || [];
 
-      res.status(200).send({ imageURL: posts });
+      res.status(200).send({ userImages: posts });
     }
   } catch (error) {
     console.error("Error getting posts:", error);
