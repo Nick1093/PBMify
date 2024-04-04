@@ -1,0 +1,18 @@
+/* Style the li to be a relative container */
+li {
+    position: relative;
+}
+
+/* Position the button in the center of the li */
+.myPosts {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+}
+
+/* Show the button when the li is hovered over */
+li:hover .myPosts {
+    display: block;
+}

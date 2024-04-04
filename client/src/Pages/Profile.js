@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Settings from '../Components/Settings';
+import Settings from '../Components/settings';
 import ViewFriends from '../Components/ViewFriends';
 import Posts from '../Components/posts';
 
