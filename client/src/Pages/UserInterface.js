@@ -9,11 +9,11 @@ import "../styles/UserInterface.css"
 
 const UserInterface = () => {
  const [popupMessage, setPopupMessage] = useState('');
- const [imageData, setImageData] = useState({});
+ const [imageData, setImageData] = useState(null);
  const [successMessage, setSuccessMsg] = useState('');
  const [paintByNumberImage, setPaintByNumberImage] = useState(null);
 
- /*useEffect(() => {
+ useEffect(() => {
   if (imageData) {
     generatePaintByNumberImage();
   }
@@ -34,21 +34,39 @@ const generatePaintByNumberImage = async () => {
     });
 
     // Convert image to grid
-    // You can use libraries like canvas or pixel.js to manipulate images in JavaScript
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    const img = new Image();
+    img.onload = function () {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      context.drawImage(img, 0, 0, img.width, img.height);
+      const imageData = context.getImageData(0, 0, img.width, img.height)
+      const data = imageData.data;
 
-    // Map pixels to numbers based on the color map
+      for (let i = 0; i < data.length; i += 4) {
+        const red = data[i];
+        const green = data[i + 1];
+        const blue = data[i + 2];
+        const rgb = `rgb(${red},${green},${blue})`;
+        if (rgb in colorMap) {
+          const number = colorMap[rgb];
+          data[i] = number;
+          data[i + 1] = number;
+          data[i + 2] = number;
+      }
+    }
 
-    // Display the paint by number image
-    // You can use canvas to draw the paint by number image
+    context.putImageData(imageData, 0, 0);
+      document.body.appendChild(canvas);
+  };
 
-    // Example:
-    // const canvas = document.getElementById('paintByNumberCanvas');
-    // const ctx = canvas.getContext('2d');
-    // Draw sections of the image using colors from the palette
+  img.src = imageData;
+
   } catch (error) {
     console.error("Error generating Paint by Number image:", error);
   }
-};*/
+};
 
  function allowDrop(event) {
    event.preventDefault();
@@ -98,7 +116,7 @@ function displaySelectedPhoto(event) {
 }
 
 
- function getNearest(palette, col) {
+ /*function getNearest(palette, col) {
    var nearest;
    const nearestDistsq = 1000000;
    for (const i = 0; i < palette.length; i++) {
@@ -112,7 +130,7 @@ function displaySelectedPhoto(event) {
        }
    }
    return nearest;
-   };
+   };*/
    
 
  function removePhoto() {
@@ -185,9 +203,9 @@ function displaySelectedPhoto(event) {
        >
            {imageData ? (
                <img
-                   src={imageData}
-                   alt="Drag and Drop You Photo"
-                   style={{ maxWidth: '90%', maxHeight: '90%' }}
+                  src={imageData}
+                  alt="Drag and Drop You Photo"
+                  style={{ maxWidth: '90%', maxHeight: '90%' }}
                />
            ) : (
                <>
