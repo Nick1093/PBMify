@@ -8,5 +8,10 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "firebase": "^10.9.0",
+    "lodash": "^4.17.21",
+    "react-image-palette": "^0.2.4"
+  }
 }

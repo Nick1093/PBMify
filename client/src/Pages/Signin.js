@@ -26,7 +26,7 @@ const Signin = () => {
 
   return (
     <div className="max-w-[700px] mx-auto my-16 p-4">
-       <Navbar />
+      <Navbar />
       <div>
         <h1 className="text-2xl font-bold py-2">Sign in to your account</h1>
         <p className="py-2">
