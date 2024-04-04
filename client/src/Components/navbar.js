@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { UserAuth } from "../Context/AuthContext";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
+
 
 const Navbar = () => {
   const { logout, awaitUser } = UserAuth();
@@ -29,12 +32,7 @@ const Navbar = () => {
             </li>
             <li>
               {" "}
-              <img
-                src="../images/pfp.png"
-                className="pfp"
-                onClick={toggleDropdown}
-                alt="pfp"
-              />
+              <FontAwesomeIcon icon={faUser} className="pfp" onClick={toggleDropdown} />
               {dropdownOpen ? (
                 <ul className="dropdown-menu">
                   <li>

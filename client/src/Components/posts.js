@@ -29,6 +29,7 @@ const Posts = ({ currentUserID }) => {
             console.error("Error fetching your posts:", error);
         }
     };
+
     useEffect(() => {
         fetchMyPosts();
     }, []);
@@ -54,12 +55,12 @@ const Posts = ({ currentUserID }) => {
 
     return (
         <div>
-            <h2>My Posts</h2>
-            <ul>
+            <h1>My Posts</h1>
+            <ul className="my-posts">
                 {myPosts.map((post, index) => (
                     <li key={index}>
-                        {<img src={`data:image/jpeg;base64,${post.imageURL}`} alt="post" />}
-                        <button onClick={() => deletePost(post.postID)} className="myPosts">
+                        {<img src={`data:image/jpeg;base64,${post.imageURL}`} alt="post" className="single-post" />}
+                        <button onClick={() => deletePost(post.postID)} className="remove-post-icon">
                             <FontAwesomeIcon icon={faTrash} />
                         </button>
                     </li>

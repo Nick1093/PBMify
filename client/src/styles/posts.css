@@ -4,7 +4,7 @@ li {
 }
 
 /* Position the button in the center of the li */
-.myPosts {
+.remove-post-icon {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -12,7 +12,16 @@ li {
     display: none;
 }
 
+.remove-post-icon {
+    background-color: red;
+    display: inline-block;
+}
+
+
+
 /* Show the button when the li is hovered over */
-li:hover .myPosts {
+li:hover .remove-post-icon {
     display: block;
 }
+
+.single-post {}
