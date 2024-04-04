@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { UserAuth } from "../Context/AuthContext";
 import Navbar from "../Components/navbar.js";
 
+import "../styles/signin.css"
+
 const Signin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

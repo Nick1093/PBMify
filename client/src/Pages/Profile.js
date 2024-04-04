@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Settings from '../Components/Settings';
 import ViewFriends from '../Components/ViewFriends';
 
-
+import "../styles/profile.css"
 
 const Profile = () => {
     const [activeComponent, setActiveComponent] = useState();
@@ -24,9 +24,9 @@ const Profile = () => {
             <h1>Profile Page</h1>
             <nav className="profile-navbar">
                 <ul>
-                    <li onClick={() => setActiveComponent('settings')}>Settings</li>
-                    <li onClick={() => setActiveComponent('viewFriends')}>View Friends</li>
-                    <li>
+                    <li className="settings-link" onClick={() => setActiveComponent('settings')}>Settings</li>
+                    <li className="friends-link" onClick={() => setActiveComponent('viewFriends')}>View Friends</li>
+                    <li className="home-link">
                         <Link to="/userHome">Home </Link>{" "}
                     </li>
                 </ul>

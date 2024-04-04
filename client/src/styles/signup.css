@@ -1,0 +1,90 @@
+@font-face {
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 400; /* Regular */
+    src: url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+}
+
+body {
+    text-align: center;
+    font-family: "Poppins", "Helvetica Neue", sans-serif;
+    font-size: 16px;
+    background-color: #f4f4f4;
+    margin: 5;
+    padding: 5;
+}
+
+h1 {
+    font-family: "Poppins", sans-serif;
+    text-align: center;
+    margin-bottom: 30px;
+    padding-top: 20px;
+}
+
+input[type="email"] {
+    width: 10%;
+    padding: 5px;
+    margin: 8px;
+    box-sizing: border-box;
+    border: 1px solid #8ECAE6;
+    border-radius: 4px;
+}
+
+input[type="password"] {
+    width: 10%;
+    padding: 5px;
+    margin: 8px;
+    box-sizing: border-box;
+    border: 1px solid #8ECAE6;
+    border-radius: 4px;
+}
+
+button[type="signup"] {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #FFB703;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button[type="signup"]:hover {
+    background-color: #FB8500;
+  }
+
+  button[type="signin"] {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #FFB703;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button[type="signin"]:hover {
+    background-color: #FB8500; 
+  }
+
+input[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+.link {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.link a {
+    text-decoration: none;
+    color: #4caf50;
+}
+
+.link a:hover {
+    text-decoration: underline;
+}

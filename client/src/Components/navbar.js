@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { UserAuth } from "../Context/AuthContext";
 
+import logo from "../images/PBMify.png";
+
+import "../styles/navbar.css"
+
 const Navbar = () => {
   const { user, logout } = UserAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false); // For the dropdown menu, false as default
@@ -14,6 +18,7 @@ const Navbar = () => {
     <>
       {user ? (
         <nav className="navBar-nav">
+          <img src={logo} alt="Logo" style={{ width: "300px", height: "auto" }} />
           <ul>
             <li>
               <Link to="/home">Home</Link>{" "}
@@ -46,6 +51,7 @@ const Navbar = () => {
         </nav>
       ) : (
         <nav className="navBar-nav">
+          <img src={logo} alt="Logo" style={{ width: "300px", height: "auto" }} />
           <ul>
             <li>
               {" "}
