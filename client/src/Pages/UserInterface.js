@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import PhotoUpload from "../Components/PhotoUpload";
 import Navbar from "../Components/navbar";
 // import { getColourPalette } from "../Components/ColorUtils";
-//import server from "../server/server";
-import { getImagePalette } from "react-image-palette";
+import { extractColors } from "extract-colors";
+import Image from "./Nick_JA_DP.jpeg";
 
 import "../styles/UserInterface.css";
 
@@ -12,6 +12,15 @@ const UserInterface = () => {
   const [imageData, setImageData] = useState({});
   const [successMessage, setSuccessMsg] = useState("");
   const [paintByNumberImage, setPaintByNumberImage] = useState(null);
+
+  // const src = "Nick_JA_DP.jpeg";
+  const src = Image;
+  extractColors(src)
+    .then((colorPalette) => {
+      console.log(colorPalette);
+      // Now colorPalette is an array of colors extracted from the image
+    })
+    .catch(console.error); // Proper error handling
 
   /*useEffect(() => {
   if (imageData) {
