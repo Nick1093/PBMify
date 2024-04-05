@@ -1,84 +1,96 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import PhotoUpload from "../Components/PhotoUpload";
 import Navbar from "../Components/navbar";
 import { getColourPalette } from "../Components/ColorUtils";
 //import server from "../server/server";
 import "../styles/UserInterface.css"
 
-import React, { useState, useRef } from "react";
-
-const matToImageData = (mat, palette, context) => {
-  const imgData = context.createImageData(mat[0].length, mat.length);
-  for (let y = 0; y < mat.length; y++) {
-    for (let x = 0; x < mat[0].length; x++) {
-      const i = (y * mat[0].length + x) * 4;
-      const col = palette[mat[y][x]];
-      imgData.data[i] = col.r;
-      imgData.data[i + 1] = col.g;
-      imgData.data[i + 2] = col.b;
-      imgData.data[i + 3] = 255;
-    }
-  }
-  return imgData;
-};
-
-const DisplayResults = ({ matSmooth, matLine, labelLocs, palette }) => {
-  const filledCanvasRef = useRef(null);
-  const outlineCanvasRef = useRef(null);
-
-  const drawFilled = () => {
-    const filledCanvas = filledCanvasRef.current;
-    const ctx = filledCanvas.getContext("2d");
-    const imgData = matToImageData(matSmooth, palette, ctx);
-    ctx.putImageData(imgData, 0, 0);
-  };
-
-  const drawOutlines = () => {
-    const outlineCanvas = outlineCanvasRef.current;
-    const gray = Math.round(255 * (1 - document.getElementById("darknessSlider").value / 100));
-    const bw = [{ r: 255, g: 255, b: 255 }, { r: gray, g: gray, b: gray }];
-    const ctx = outlineCanvas.getContext("2d");
-    const imgData = matToImageData(matLine, bw, ctx);
-    ctx.putImageData(imgData, 0, 0);
-
-    ctx.font = "12px Georgia";
-    ctx.fillStyle = `rgb(${gray}, ${gray}, ${gray})`;
-    labelLocs.forEach((label) => {
-      ctx.fillText(label.value + 1, label.x - 3, label.y + 4);
-    });
-  };
-
-  return (
-    <div>
-      <canvas id="filled-canvas" ref={filledCanvasRef}></canvas>
-      <canvas id="outline-canvas" ref={outlineCanvasRef}></canvas>
-    </div>
-  );
-};
-
 const UserInterface = () => {
   const [step, setStep] = useState("load");
   const [view, setView] = useState("");
   const [status, setStatus] = useState("");
   const [palette, setPalette] = useState([]);
+  const [image, setImageSrc] = useState([]);
   const [colorInfoVisible, setColorInfoVisible] = useState(false);
   const [c, setC] = useState(null);
   const [ctx, setCtx] = useState(null);
   const [c2, setC2] = useState(null);
   const [c3, setC3] = useState(null);
+  const imgCanvasRef = useRef(null);
+  const widthSliderRef = useRef(null);
+  const canvasesRef = useRef(null);
+  const [darknessSliderValue, setDarknessSliderValue] = useState(50);
   const [loaderStyle, setLoaderStyle] = useState({
     border: "4px dashed #777777"
   });
+
+  const matToImageData = (mat, palette, context) => {
+    const imgData = context.createImageData(mat[0].length, mat.length);
+    for (let y = 0; y < mat.length; y++) {
+      for (let x = 0; x < mat[0].length; x++) {
+        const i = (y * mat[0].length + x) * 4;
+        const col = palette[mat[y][x]];
+        imgData.data[i] = col.r;
+        imgData.data[i + 1] = col.g;
+        imgData.data[i + 2] = col.b;
+        imgData.data[i + 3] = 255;
+      }
+    }
+    return imgData;
+  };
+  
+  const DisplayResults = ({ matSmooth, matLine, labelLocs, palette }) => {
+    const filledCanvasRef = useRef(null);
+    const outlineCanvasRef = useRef(null);
+  
+    const drawFilled = () => {
+      const filledCanvas = filledCanvasRef.current;
+      const ctx = filledCanvas.getContext("2d");
+      const imgData = matToImageData(matSmooth, palette, ctx);
+      ctx.putImageData(imgData, 0, 0);
+    };
+  
+    const drawOutlines = () => {
+  const outlineCanvas = outlineCanvasRef.current;
+  const gray = Math.round(255 * (1 - darknessSliderValue / 100));
+  const bw = [{ r: 255, g: 255, b: 255 }, { r: gray, g: gray, b: gray }];
+  const ctx = outlineCanvas.getContext("2d");
+  const imgData = matToImageData(matLine, bw, ctx);
+  ctx.putImageData(imgData, 0, 0);
+  
+  ctx.font = "12px Georgia";
+  ctx.fillStyle = `rgb(${gray}, ${gray}, ${gray})`;
+  labelLocs.forEach((label) => {
+    ctx.fillText(label.value + 1, label.x - 3, label.y + 4);
+  });
+  
+  
+    return (
+      <div>
+        <canvas id="filled-canvas" ref={filledCanvasRef}></canvas>
+        <canvas id="outline-canvas" ref={outlineCanvasRef}></canvas>
+      </div>
+    );
+  };
+
+  const handleImageUpload = (file) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setImageSrc(e.target.result);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const imageLoaded = (imgSrc) => {
     const img = new Image();
     img.src = imgSrc;
     img.onload = () => {
-      const c = document.getElementById("img-canvas");
-      c.width = document.getElementById("widthSlider").value;
+      const c = imgCanvasRef.current;
       const scale = c.width / img.naturalWidth;
       c.height = img.naturalHeight * scale;
-      document.getElementById("canvases").style.height = (c.height + 20) + "px";
+      if (canvasesRef.current) {
+        canvasesRef.current.style.height = (c.height + 20) + "px";
+      }
       const ctx = c.getContext("2d");
       ctx.drawImage(img, 0, 0, c.width, c.height);
       setStep("select");
@@ -259,9 +271,12 @@ const UserInterface = () => {
   
   const newImage = () => {
     setPalette([]);
-    document.getElementById("canvases").style.height = "0px";
+    if (canvasesRef.current) {
+      canvasesRef.current.style.height = "0px";
+    }
     setStep("load");
   };
+  
 
   const recolor = () => {
     setStep("select");
@@ -326,6 +341,10 @@ const UserInterface = () => {
     win.document.write('<html><head><title>PBN palette</title></head><body><img src="' + canvas.toDataURL() + '"></body></html>');
     // win.print();
   };
+}
+
+
+
 }
 
 export default UserInterface;
