@@ -3,7 +3,7 @@ import PhotoUpload from "../Components/PhotoUpload";
 import Navbar from "../Components/navbar";
 // import { getColourPalette } from "../Components/ColorUtils";
 //import server from "../server/server";
-import { getImagePalette } from "react-image-palette";
+// import { getImagePalette } from "react-image-palette";
 
 import "../styles/UserInterface.css";
 
