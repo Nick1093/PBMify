@@ -1,10 +1,8 @@
-// ColorUtils.js
+// colorUtils.js
 
-// Import any necessary libraries for color manipulation
-import Vibrant from 'node-vibrant'; // Example library for color extraction
+import Vibrant from 'node-vibrant';
 
-// Function to get the color palette from an image
-export const getColorPalette = async (imageData) => {
+export const getColourPalette = async (imageData) => {
   try {
     const palette = await Vibrant.from(imageData).getPalette();
     const colors = Object.values(palette).map((swatch) => swatch.getHex());
