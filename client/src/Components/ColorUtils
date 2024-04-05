@@ -1,0 +1,14 @@
+// colorUtils.js
+
+import Vibrant from 'node-vibrant';
+
+export const getColourPalette = async (imageData) => {
+  try {
+    const palette = await Vibrant.from(imageData).getPalette();
+    const colors = Object.values(palette).map((swatch) => swatch.getHex());
+    return colors;
+  } catch (error) {
+    console.error("Error getting color palette:", error);
+    throw new Error("Failed to get color palette");
+  }
+};
