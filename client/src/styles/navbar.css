@@ -1,0 +1,37 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.logo {
+    height: 15px;
+    background-image: url('PBMify.png');
+    background-size: contain; 
+    background-repeat: no-repeat;
+}
+
+.navBar-nav {
+    background-color: #023047;
+    padding: 10px;
+    list-style-type: none;
+    text-align: center;
+}
+
+.navBar-nav li {
+    display: inline-block;
+}
+
+.navBar-nav li a {
+    color: #8ECAE6;
+    font-family: "Poppins", sans-serif;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    transition: background-color 0.3s; 
+}
+
+/* Change link color on hover */
+.navBar-nav li a:hover {
+    background-color: #1a2c40; /* Darker background color on hover */
+}

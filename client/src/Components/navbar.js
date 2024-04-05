@@ -1,9 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { UserAuth } from "../Context/AuthContext";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
+
+
+import logo from "../images/PBMify.png";
+
+import "../styles/navbar.css"
 
 const Navbar = () => {
-  const { user, logout } = UserAuth();
+  const { logout, awaitUser } = UserAuth();
+  const { user } = UserAuth();
+
   const [dropdownOpen, setDropdownOpen] = useState(false); // For the dropdown menu, false as default
   const toggleDropdown = () => {
     // changes state of dropdownOpen
@@ -14,6 +23,7 @@ const Navbar = () => {
     <>
       {user ? (
         <nav className="navBar-nav">
+          <img src={logo} alt="Logo" style={{ width: "300px", height: "auto" }} />
           <ul>
             <li>
               <Link to="/home">Home</Link>{" "}
@@ -27,12 +37,7 @@ const Navbar = () => {
             </li>
             <li>
               {" "}
-              <img
-                src="../images/pfp.png"
-                className="pfp"
-                onClick={toggleDropdown}
-                alt="pfp"
-              />
+              <FontAwesomeIcon icon={faUser} className="pfp" onClick={toggleDropdown} />
               {dropdownOpen ? (
                 <ul className="dropdown-menu">
                   <li>
@@ -46,6 +51,7 @@ const Navbar = () => {
         </nav>
       ) : (
         <nav className="navBar-nav">
+          <img src={logo} alt="Logo" style={{ width: "300px", height: "auto" }} />
           <ul>
             <li>
               {" "}

@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { UserAuth } from "../Context/AuthContext";
 import Navbar from "../Components/navbar.js";
 
+import "../styles/signin.css"
+
 const Signin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,7 +26,7 @@ const Signin = () => {
 
   return (
     <div className="max-w-[700px] mx-auto my-16 p-4">
-       <Navbar />
+      <Navbar />
       <div>
         <h1 className="text-2xl font-bold py-2">Sign in to your account</h1>
         <p className="py-2">
