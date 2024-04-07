@@ -1,0 +1,48 @@
+/* Reset default browser styles */
+html, body, ul, li {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  
+  /* Style for the container of the community tab */
+  .community-tab {
+    width: 100%;
+    padding: 20px;
+  }
+  
+  /* Style for each individual image post */
+  .image-post {
+    display: inline-block;
+    width: 200px;
+    margin: 10px;
+  }
+  
+  /* Style for the image within the post */
+  .image-post img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Style for the caption or description of the image */
+  .image-caption {
+    margin-top: 5px;
+    font-size: 14px;
+    color: #555;
+  }
+  
+  /* Style for the username or author of the post */
+  .post-author {
+    margin-top: 5px;
+    font-size: 12px;
+    color: #888;
+  }
+  
+  /* Style for the timestamp of the post */
+  .post-timestamp {
+    font-size: 10px;
+    color: #aaa;
+  }
+  
