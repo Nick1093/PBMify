@@ -1,61 +1,27 @@
-.profile-page {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  
-  .profile-info {
-    display: flex;
-    align-items: center;
-  }
-  
-  .profile-image {
-    width: 150px; /* Adjust size as needed */
-    height: 150px; /* Adjust size as needed */
-    border-radius: 50%; /* Rounded shape for profile image */
-    margin-right: 20px;
-  }
+.profile-nav {
+    position: fixed;
+    left: 0;
+    top: 40%;
+    height: 100%;
+    width: 200px;
+    overflow: auto;
+    padding: 1rem;
+}
 
-  .settings-link {
-    cursor: pointer;
-    color: #333;
-    font-weight: bold;
-    text-decoration: underline;
-  }
-  
-  .settings-link:hover {
-    /* Styles when hovering over the element */
-    color: #555;
-  }
+.profile-list {
+    list-style-type: none;
+    padding: 0;
+}
 
-  .friends-link {
+.profile-list li {
+    padding: 1rem 0;
     cursor: pointer;
-    color: #333;
-    font-weight: bold;
-    text-decoration: underline;
-  }
-  
-  .friends-link:hover {
-    /* Styles when hovering over the element */
-    color: #555;
-  }
-  
-  .home-link {
-    cursor: pointer;
-    color: #333;
-    font-weight: bold;
-    text-decoration: underline;
-  }
-  
-  .home-link:hover {
-    /* Styles when hovering over the element */
-    color: #555;
-  }
+    transition: all 0.3s ease;
+}
 
-  .profile-details {
-    flex: 1;
-  }
-  
-  .profile-details h2 {
-    margin-top: 0;
-  }
+.profile-list li:hover {
+    background-color: #1a2c40;
+    border-radius: 20px;
+    color: white;
+
+}

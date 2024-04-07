@@ -35,12 +35,12 @@ const Navbar = () => {
               {" "}
               <Link to="/PBMify">PBMify</Link>
             </li>
-            <li>
+            <li className="userPfp">
               {" "}
               <FontAwesomeIcon icon={faUser} className="pfp" onClick={toggleDropdown} />
               {dropdownOpen ? (
                 <ul className="dropdown-menu">
-                  <li>
+                  <li className="dropdown-text">
                     <Link to="/profile">View Profile</Link>
                   </li>
                   <li onClick={logout}> Sign Out</li>
