@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import PhotoUpload from "../Components/PhotoUpload";
 import Navbar from "../Components/navbar";
 import { getColourPalette } from "../Components/ColorUtils";
+import ProcessImage from "../Components/ProcessImage"
 //import server from "../server/server";
 import "../styles/UserInterface.css"
 
@@ -10,21 +11,106 @@ const UserInterface = () => {
   const [view, setView] = useState("");
   const [status, setStatus] = useState("");
   const [palette, setPalette] = useState([]);
-  const [image, setImageSrc] = useState([]);
+  const [imageSrc, setImageSrc] = useState(null);
   const [colorInfoVisible, setColorInfoVisible] = useState(false);
   const [c, setC] = useState(null);
   const [ctx, setCtx] = useState(null);
   const [c2, setC2] = useState(null);
   const [c3, setC3] = useState(null);
   const imgCanvasRef = useRef(null);
+  const [popupMessage, setPopupMessage] = useState('');
+  const [imageData, setImageData] = useState({});
+  const [successMessage, setSuccessMsg] = useState('');
   const widthSliderRef = useRef(null);
   const canvasesRef = useRef(null);
-  const [darknessSliderValue, setDarknessSliderValue] = useState(50);
-  const [loaderStyle, setLoaderStyle] = useState({
-    border: "4px dashed #777777"
-  });
+  const outlineCanvasRef = useRef(null);
+  const darknessSliderRef = useRef(null);
+  const [widthSliderValue, setWidthSliderValue] = useState(800); // Default width slider value
+  const [darknessSliderValue, setDarknessSliderValue] = useState(40); // Default darkness slider value
+  const fileInputRef = useRef(null);
+  const loaderStyle = {
+    border: '4px dashed #777777',
+    padding: '20px',
+    textAlign: 'center',
+    margin: '20px',
+  };
 
-  const matToImageData = (mat, palette, context) => {
+  useEffect(() => {
+    console.log("useEffect for imageSrc called:", imageSrc);
+    if (imageSrc) {
+      const img = new Image();
+      img.src = imageSrc;
+      img.onload = () => {
+        const canvas = imgCanvasRef.current;
+        if (canvas && canvas.getContext) {
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+        }
+      };
+    }
+  }, [imageSrc]);
+  
+
+  function allowDrop(event) {
+    event.preventDefault();
+  }
+ 
+  function drop(event) {
+    event.preventDefault();
+    const files = event.dataTransfer.files;
+    console.log(files)
+    console.log("files.length:",files.length)
+ 
+ 
+    if (files.length > 0) {
+      const file = files[0];
+      console.log("file:", file)
+ 
+ 
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+ 
+ 
+        reader.onload = function (e) {
+          setPopupMessage('Your photo is added');
+          setImageData(e.target.result);
+        };
+ 
+ 
+        reader.readAsDataURL(file);
+      } else {
+        alert('Please drop an image file.');
+      }
+    }
+  }
+ 
+  function displaySelectedPhoto(event) {
+    const file = event.target.files[0];
+  
+    if (file) {
+      const reader = new FileReader();
+  
+      reader.onload = function (e) {
+        setPopupMessage('Your photo is added');
+        setImageData(e.target.result);
+      };
+  
+      reader.readAsDataURL(file);
+    }
+  }
+  
+
+  function handleWidthSliderChange(e) {
+    setWidthSliderValue(e.target.value);
+  };
+
+  function handleDarknessSliderChange(e) {
+    setDarknessSliderValue(e.target.value);
+  };
+
+  function matToImageData(mat, palette, context) {
     const imgData = context.createImageData(mat[0].length, mat.length);
     for (let y = 0; y < mat.length; y++) {
       for (let x = 0; x < mat[0].length; x++) {
@@ -39,11 +125,11 @@ const UserInterface = () => {
     return imgData;
   };
   
-  const DisplayResults = ({ matSmooth, matLine, labelLocs, palette }) => {
+  function DisplayResults({ matSmooth, matLine, labelLocs, palette }) {
     const filledCanvasRef = useRef(null);
     const outlineCanvasRef = useRef(null);
   
-    const drawFilled = () => {
+    function drawFilled() {
       const filledCanvas = filledCanvasRef.current;
       const ctx = filledCanvas.getContext("2d");
       const imgData = matToImageData(matSmooth, palette, ctx);
@@ -51,19 +137,18 @@ const UserInterface = () => {
     };
   
     const drawOutlines = () => {
-  const outlineCanvas = outlineCanvasRef.current;
-  const gray = Math.round(255 * (1 - darknessSliderValue / 100));
-  const bw = [{ r: 255, g: 255, b: 255 }, { r: gray, g: gray, b: gray }];
-  const ctx = outlineCanvas.getContext("2d");
-  const imgData = matToImageData(matLine, bw, ctx);
-  ctx.putImageData(imgData, 0, 0);
-  
-  ctx.font = "12px Georgia";
-  ctx.fillStyle = `rgb(${gray}, ${gray}, ${gray})`;
-  labelLocs.forEach((label) => {
-    ctx.fillText(label.value + 1, label.x - 3, label.y + 4);
+    const outlineCanvas = outlineCanvasRef.current;
+    const gray = Math.round(255 * (1 - darknessSliderValue / 100));
+    const bw = [{ r: 255, g: 255, b: 255 }, { r: gray, g: gray, b: gray }];
+    const ctx = outlineCanvas.getContext("2d");
+    const imgData = matToImageData(matLine, bw, ctx);
+    ctx.putImageData(imgData, 0, 0);
+    
+    ctx.font = "12px Georgia";
+    ctx.fillStyle = `rgb(${gray}, ${gray}, ${gray})`;
+    labelLocs.forEach((label) => {
+      ctx.fillText(label.value + 1, label.x - 3, label.y + 4);
   });
-  
   
     return (
       <div>
@@ -71,41 +156,51 @@ const UserInterface = () => {
         <canvas id="outline-canvas" ref={outlineCanvasRef}></canvas>
       </div>
     );
-  };
-
-  const handleImageUpload = (file) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setImageSrc(e.target.result);
     };
-    reader.readAsDataURL(file);
   };
 
-  const imageLoaded = (imgSrc) => {
+  function handleImageUpload(e) {
+    const file = e.target.files[0]; // Getting the uploaded file
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImageSrc(e.target.result); // Set the uploaded image's base64 encoded URL
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+  
+  
+  function imageLoaded(imageSrc){
     const img = new Image();
-    img.src = imgSrc;
+    img.src = imageSrc;
     img.onload = () => {
-      const c = imgCanvasRef.current;
-      const scale = c.width / img.naturalWidth;
-      c.height = img.naturalHeight * scale;
-      if (canvasesRef.current) {
-        canvasesRef.current.style.height = (c.height + 20) + "px";
-      }
-      const ctx = c.getContext("2d");
-      ctx.drawImage(img, 0, 0, c.width, c.height);
+      const canvas = imgCanvasRef.current;
+      if (!canvas) return;
+  
+      // Set the canvas dimensions to match the uploaded image's dimensions
+      canvas.width = img.width;
+      canvas.height = img.height;
+  
+      // Draw the image onto the canvas
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, img.width, img.height);
+  
+      // Proceed to the next step in your application logic
       setStep("select");
     };
   };
+  
 
-  const addColor = (color) => {
+  function addColor(color) {
     setPalette([...palette, color]);
   };
 
-  const removeColor = (color) => {
+  function removeColor(color) {
     setPalette(palette.filter((c) => c !== color));
   };
 
-  const getNearest = (palette, col) => {
+  function getNearest(palette, col) {
     let nearest;
     let nearestDistsq = 1000000;
     for (let i = 0; i < palette.length; i++) {
@@ -122,7 +217,7 @@ const UserInterface = () => {
     return nearest;
   };
   
-  const imageDataToSimpMat = (imgData, palette) => {
+  function imageDataToSimpMat(imgData, palette) {
     const mat = [];
     for (let i = 0; i < imgData.height; i++) {
       mat[i] = new Array(imgData.width);
@@ -140,11 +235,11 @@ const UserInterface = () => {
     return mat;
   };
   
-  const rgbToHex = (r, g, b) => {
+  function rgbToHex(r, g, b) {
     return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
   };
   
-  const rgbToCmyk = (r, g, b) => {
+  function rgbToCmyk(r, g, b) {
     const k = 1 - Math.max(r / 255, g / 255, b / 255);
     let c, m, y;
     if (k === 1) {
@@ -165,7 +260,7 @@ const UserInterface = () => {
     };
   };
 
-  const rgbToHsl = (r, g, b) => {
+  function rgbToHsl(r, g, b) {
     r = r / 255;
     g = g / 255;
     b = b / 255;
@@ -199,7 +294,7 @@ const UserInterface = () => {
     };
   };
   
-  const rgbToHsv = (r, g, b) => {
+  function rgbToHsv(r, g, b) {
     r = r / 255;
     g = g / 255;
     b = b / 255;
@@ -232,7 +327,7 @@ const UserInterface = () => {
     };
   };
   
-  const getColorInfo = (palette) => {
+  function getColorInfo(palette) {
     for (let i = 0; i < palette.length; i++) {
       const col = palette[i];
       col.hex = rgbToHex(col.r, col.g, col.b);
@@ -242,14 +337,14 @@ const UserInterface = () => {
     }
   };
   
-  const pbnify = () => {
+  function pbnify() {
     setStep("process");
     const width = c.width;
     const height = c.height;
     const imgData = ctx.getImageData(0, 0, width, height);
     const mat = imageDataToSimpMat(imgData, palette);
   
-    const worker = new Worker('scripts/processImage.js');
+    const worker = new Worker(ProcessImage);
     worker.addEventListener('message', (e) => {
       if (e.data.cmd === "status") {
         setStatus(e.data.status);
@@ -269,7 +364,7 @@ const UserInterface = () => {
   };
 
   
-  const newImage = () => {
+  function newImage() {
     setPalette([]);
     if (canvasesRef.current) {
       canvasesRef.current.style.height = "0px";
@@ -278,43 +373,43 @@ const UserInterface = () => {
   };
   
 
-  const recolor = () => {
+  function recolor() {
     setStep("select");
   };
 
-  const clearPalette = () => {
+  function clearPalette() {
     setPalette([]);
   };
 
-  const showColorInfo = () => {
+  function showColorInfo() {
     setColorInfoVisible(true);
   };
 
-  const hideColorInfo = () => {
+  function hideColorInfo() {
     setColorInfoVisible(false);
   };
 
-  const viewFilled = () => {
+  function viewFilled() {
     setView("filled");
   };
 
-  const viewOutline = () => {
+  function viewOutline() {
     setView("outline");
   };
 
-  const saveFilled = () => {
+  function saveFilled() {
     const win = window.open();
     win.document.write('<html><head><title>PBN filled</title></head><body><img src="' + c2.toDataURL() + '"></body></html>');
     // win.print();
   };
 
-  const saveOutline = () => {
+  function saveOutline() {
     const win = window.open();
     win.document.write('<html><head><title>PBN outline</title></head><body><img src="' + c3.toDataURL() + '"></body></html>');
     // win.print();
   };
 
-  const savePalette = () => {
+  function savePalette() {
     const canvas = document.createElement('canvas');
     canvas.width = 80 * Math.min(palette.length, 10);
     canvas.height = 80 * (Math.floor((palette.length - 1) / 10) + 1);
@@ -337,14 +432,233 @@ const UserInterface = () => {
       ctx.strokeRect(x + 10, y + 10, 60, 60);
     }
 
-    const win = window.open();
+    const win = window.open(); {
     win.document.write('<html><head><title>PBN palette</title></head><body><img src="' + canvas.toDataURL() + '"></body></html>');
     // win.print();
   };
 }
 
+  function printResult() {
+    if (!outlineCanvasRef.current) return;
+    const img = outlineCanvasRef.current.toDataURL('image/png');
+    const win = window.open();
+    win.document.write(`<img src="${img}" onload="window.print();window.close()" />`);
+  };
 
+  function removePhoto() {
+    setImageData('');
+    setPopupMessage('Your photo is removed');
+  }
+ 
 
+  
+  return (
+    <div className="col">
+      {/* Description section explaining each step of the process */}
+      <div id="description">
+        {/* Dynamic classes applied based on the current step to highlight the active step */}
+        <p className={step !== 'load' ? 'other-step' : ''}>1. Load an image.</p>
+        <p className={step !== 'select' ? 'other-step' : ''}>2. Click some points on the image to select your color palette.</p>
+        <p className={step !== 'select' || palette.length < 2 ? 'other-step' : ''}>3. Click PBNify and the image will be converted to a paint by number template.</p>
+        <p className={step !== 'result' ? 'other-step' : ''}>4. Save the outline and palette, print them out, and paint/color.</p>
+        {/* Privacy note */}
+      </div>
+
+      {/* Width Slider */}
+      {/* Conditional rendering based on the 'load' step */}
+      {step === 'load' && (
+        <div>
+          <label htmlFor="widthSlider">Resize width to: <span>{widthSliderValue}</span>px</label>
+          {/* Slider input for adjusting the width */}
+          <input
+            type="range"
+            min="400"
+            max="2000"
+            step="10"
+            value={widthSliderValue}
+            onChange={handleWidthSliderChange}
+            id="widthSlider"
+          />
+        </div>
+      )}
+
+      {/* Darkness Slider */}
+      {/* Similar conditional rendering for the darkness adjustment slider */}
+      {step === 'load' && (
+        <div>
+          <label htmlFor="darknessSlider">Outline darkness: <span style={{ color: `rgb(${255 * (1 - darknessSliderValue / 100)}, ${255 * (1 - darknessSliderValue / 100)}, ${255 * (1 - darknessSliderValue / 100)})` }}>{darknessSliderValue}</span></label>
+          <input
+            type="range"
+            min="1"
+            max="100"
+            step="1"
+            value={darknessSliderValue}
+            onChange={handleDarknessSliderChange}
+            id="darknessSlider"
+          />
+        </div>
+      )}
+
+      {/* Image Upload Section */}
+      {/* Conditionally displayed based on the current step */}
+      {step === 'load' && (
+      <div className="PhotoUploadZone">
+      <div
+          id="dropZone"
+          onDragOver={allowDrop}
+          onDrop={drop}
+          style={loaderStyle}
+      >
+          {imageData ? (
+              <img
+                  src={imageData}
+                  alt="Drag and drop your photo"
+                  style={{ maxWidth: '90%', maxHeight: '90%' }}
+              />
+          ) : (
+              <>
+                  <h1 style={{ color: 'lightgray' }}>
+                      {/* <link rel="preconnect" href="https://fonts.googleapis.com">
+                      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> */}
+                      {/* <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Tilt+Warp&display=swap" rel="stylesheet"> */}
+                      Drag and Drop Your Photo
+                      {/* </link>
+                      </link>
+                      </link> */}
+                  </h1>
+              </>
+          )}
+      </div>
+      
+      <label htmlFor="photoInput" id="addPhotoBtn">
+          Add Photo
+      </label>
+      <input
+          type="file"
+          id="photoInput"
+          accept="image/*"
+          onChange={displaySelectedPhoto}
+          style={{ display: 'none' }}
+      />
+      <button id="removePhotoBtn" onClick={removePhoto}>
+          {/* <link rel="preconnect" href="https://fonts.googleapis.com">
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+          <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Tilt+Warp&display=swap" rel="stylesheet">
+              Remove Photo
+          </link>
+          </link>
+          </link> */}
+          Remove Photo
+      </button>
+      {popupMessage && <div className="popup">{popupMessage}</div>}
+      {/* <button onClick={saveImage}>Save Image</button> */}
+      {successMessage && <div className="saveSuccess">{successMessage}</div>}
+      </div>  
+      )}
+
+<div className="col" id="toolbar">
+  {step !== 'process' && (
+    <div id="buttons">
+      {(step === 'select' || step === 'result') && (
+        <button type="button" className="btn btn-secondary" onClick={newImage}>new image</button>
+      )}
+      {step === 'select' && palette.length > 0 && (
+        <button type="button" className="btn btn-secondary" onClick={clearPalette}>clear palette</button>
+      )}
+      {step === 'select' && palette.length > 1 && (
+        <button type="button" className="btn btn-primary" onClick={pbnify}>PBNify</button>
+      )}
+      {step === 'result' && (
+        <button type="button" className="btn btn-secondary" onClick={recolor}>recolor</button>
+      )}
+      {step === 'result' && (
+        <>
+          <div className="btn-group" role="group">
+            <button type="button" className="btn btn-primary" onClick={viewFilled}>filled</button>
+            <button type="button" className="btn btn-success" onClick={saveFilled}>save</button>
+          </div>
+          <div className="btn-group" role="group">
+            <button type="button" className="btn btn-primary" onClick={viewOutline}>outline</button>
+            <button type="button" className="btn btn-success" onClick={saveOutline}>save</button>
+          </div>
+          <button type="button" className="btn btn-success" onClick={savePalette}>save palette</button>
+        </>
+      )}
+    </div>
+  )}
+  {step === 'process' && (
+    <div>
+      <img id="spinner" src="images/spinner.png" alt="Loading" /> {status}
+    </div>
+  )}
+  </div>
+
+  <div className="col" id="palette">
+    {palette.map((color, index) => (
+      <div className="swatch" key={index} style={{ backgroundColor: `rgb(${color.r}, ${color.g}, ${color.b})` }}>
+        {step === 'result' && (view === 'outline' || colorInfoVisible) && (
+          <div className="swatch-label">{index + 1}</div>
+        )}
+        {step === 'select' && (
+          <img src="images/delete.png" alt="Delete" onClick={() => removeColor(color)} />
+        )}
+      </div>
+    ))}
+  </div>
+
+  {step === 'result' && (
+    <div className="col" id="color-info">
+      {!colorInfoVisible && (
+        <button type="button" className="btn btn-secondary" onClick={showColorInfo}>show color info</button>
+      )}
+      {colorInfoVisible && (
+        <button type="button" className="btn btn-secondary" onClick={hideColorInfo}>hide color info</button>
+      )}
+      {colorInfoVisible && palette.map((color, index) => (
+        <p key={index}>
+          <strong>{index + 1}</strong>: {color.hex} |
+          <strong>RGB</strong>({color.r}, {color.g}, {color.b}) |
+          <strong>HSL</strong>({color.hsl.h}, {color.hsl.s}%, {color.hsl.l}%) |
+          <strong>HSV/HSB</strong>({color.hsv.h}, {color.hsv.s}%, {color.hsv.v}%) |
+          <strong>CMYK</strong>({color.cmyk.c}%, {color.cmyk.m}%, {color.cmyk.y}%, {color.cmyk.k}%)
+        </p>
+      ))}
+    </div>
+  )}
+
+  {step !== 'load' && (
+    <div className="col" id="canvases">
+      {(step === 'select' || step === 'process') && (
+        <div className="canvas-container">
+          <canvas id="img-canvas"></canvas>
+          {palette.map((color, index) => (
+            <div 
+              className="sample-point" 
+              key={index} 
+              style={{ left: `${color.x - 5}px`, top: `${color.y - 5}px` }}
+            ></div>
+          ))}
+        </div>
+      )}
+      {step === 'result' && view === 'filled' && (
+        <div className="canvas-container">
+          <canvas id="filled-canvas"></canvas>
+        </div>
+      )}
+      {step === 'result' && view === 'outline' && (
+        <div className="canvas-container">
+          <canvas id="outline-canvas"></canvas>
+        </div>
+      )}
+    </div>
+  )}
+
+      </div>
+
+      
+  
+    
+  );
 }
 
 export default UserInterface;
