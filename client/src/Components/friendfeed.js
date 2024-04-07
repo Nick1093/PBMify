@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { UserAuth } from "../Context/AuthContext";
+import "../styles/friendfeedpage.css"
 
 const FriendFeedComponent = ({ currentUserID }) => {
     const { user } = UserAuth();
