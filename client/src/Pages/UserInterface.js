@@ -22,45 +22,6 @@ const UserInterface = () => {
     })
     .catch(console.error); // Proper error handling
 
-  /*useEffect(() => {
-  if (imageData) {
-    generatePaintByNumberImage();
-  }
-}, [imageData]);
-
-const generatePaintByNumberImage = async () => {
-  try {
-    // Get color palette from the uploaded image
-    const palette = await getColourPalette(imageData);
-    const palette = getImagePalette("foo.jpg");
-    console.log(palette);
-
-    // Limit palette to 20 colors
-    const limitedPalette = palette.slice(0, 20);
-
-    // Map colors to numbers
-    const colorMap = {};
-    limitedPalette.forEach((color, index) => {
-      colorMap[color] = index + 1; // Assigning numbers starting from 1
-    });
-
-    // Convert image to grid
-    // You can use libraries like canvas or pixel.js to manipulate images in JavaScript
-
-    // Map pixels to numbers based on the color map
-
-    // Display the paint by number image
-    // You can use canvas to draw the paint by number image
-
-    // Example:
-    // const canvas = document.getElementById('paintByNumberCanvas');
-    // const ctx = canvas.getContext('2d');
-    // Draw sections of the image using colors from the palette
-  } catch (error) {
-    console.error("Error generating Paint by Number image:", error);
-  }
-};*/
-
   function allowDrop(event) {
     event.preventDefault();
   }
@@ -103,23 +64,6 @@ const generatePaintByNumberImage = async () => {
 
       reader.readAsDataURL(file);
     }
-  }
-
-  function getNearest(palette, col) {
-    var nearest;
-    const nearestDistsq = 1000000;
-    for (const i = 0; i < palette.length; i++) {
-      const pcol = palette[i];
-      const distsq =
-        Math.pow(pcol.r - col.r, 2) +
-        Math.pow(pcol.g - col.g, 2) +
-        Math.pow(pcol.b - col.b, 2);
-      if (distsq < nearestDistsq) {
-        nearest = i;
-        nearestDistsq = distsq;
-      }
-    }
-    return nearest;
   }
 
   function removePhoto() {
@@ -201,19 +145,19 @@ const generatePaintByNumberImage = async () => {
               {/* <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Tilt+Warp&display=swap" rel="stylesheet"> */}
               Drag and Drop Your Photo
               {/* </link>
-                       </link>
-                       </link> */}
+                      </link>
+                      </link> */}
             </h1>
           </>
         )}
       </div>
       <label htmlFor="photoInput" id="addPhotoBtn">
         {/* <link rel="preconnect" href="https://fonts.googleapis.com">
-           <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-           <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Tilt+Warp&display=swap" rel="stylesheet">
-               Add Photo
-           </link>
-           </link>
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+          <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Tilt+Warp&display=swap" rel="stylesheet">
+              Add Photo
+          </link>
+          </link>
            </link> */}
         Add Photo
       </label>
@@ -226,11 +170,11 @@ const generatePaintByNumberImage = async () => {
       />
       <button id="removePhotoBtn" onClick={removePhoto}>
         {/* <link rel="preconnect" href="https://fonts.googleapis.com">
-           <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-           <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Tilt+Warp&display=swap" rel="stylesheet">
-               Remove Photo
-           </link>
-           </link>
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+          <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Tilt+Warp&display=swap" rel="stylesheet">
+            Remove Photo
+          </link>
+          </link>
            </link> */}
         Remove Photo
       </button>
