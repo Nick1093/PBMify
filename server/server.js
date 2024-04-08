@@ -223,28 +223,65 @@ app.get("/fetch-posts", async (req, res) => {
   }
 });
 
-app.get("/get-friends", async (req, res) => {
-  //get UserID
-  const { userID } = req.query;
-  console.log("userID:", userID);
-  console.log("---------------------------");
-  //connect to firestore
-
-  //Reference the 'Users' collection
-  const userDoc = db.collection("Users").doc(userID);
-  const docSnapshot = await userDoc.get();
+// Create a new post for the adding friend function
+app.post("/add-friend", async (req, res) => {
+  // Get data from the front end
+  const { userID, userEmail } = req.body;
 
   try {
-    if (!docSnapshot.exists) {
-      console.log("Used document not found", userID);
-      res.status(404).send({ message: "User not found", userID: userID });
-    } else {
-      const friendsArray = docSnapshot.data().friends || [];
-      res.status(200).send(friendsArray);
+
+    console.log(userID, userEmail);
+    // Reference the Firestore database
+    const db = admin.firestore();
+
+    // Reference to the 'Users' collection
+    const users = db.collection("Users");
+
+    // Retrieve the document of the initial user
+    const initialUserDoc = await users.doc(userID).get();
+
+    // Get the current friends list of the initial user
+    const initialUserFriends = initialUserDoc.data().friends || [];
+
+    // Query the collection to find the document with the provided email
+    const userSnapshot = await users.where("email", "==", userEmail).get();
+
+    // Check if a user with the provided email exists
+    if (userSnapshot.empty) {
+      // User not found, handle accordingly
+      return res.status(404).send("User not found");
     }
+
+    // Assuming there's only one document with a given email (unique emails)
+    const userDoc = userSnapshot.docs[0];
+
+    // Get the user's ID
+    const friendUserId = userDoc.id;
+
+    // Add the friend's ID and email to the initial user's friends list
+    if (!initialUserFriends.includes(friendUserId)) {
+      initialUserFriends.push({ "friendUserId": friendUserId, "friendEmail": userEmail });
+
+      // Add the initial user's ID and email to the provided user's friends list
+      const userFriends = userDoc.data().friends || [];
+      if (!userFriends.some(friend => friend.friendUserId === userID)) {
+        userFriends.push({ "friendUserId": userID, "friendEmail": initialUserDoc.data().email });
+
+        // Update the provided user's document with the modified friends list
+        await userDoc.ref.update({ friends: userFriends });
+      }
+
+
+      // Update the initial user's document with the modified friends list
+      await initialUserDoc.ref.update({ friends: initialUserFriends });
+    } else {
+      return res.status(400).send("User is already in the friend list");
+    }
+
+    res.status(200).send("Friend added successfully");
   } catch (error) {
-    console.error("error getting posts:", error);
-    res.status(500).send("An error occurred");
+    console.error("Error adding friend:", error);
+    res.status(500).send("Internal server error");
   }
 });
 
