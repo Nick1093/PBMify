@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import _ from 'lodash';
 
-function ProcessImage(mat) {
+function ImageProcessor(mat) {
     const [processedMat, setProcessedMat] = useState(null);
     const [labelLocs, setLabelLocs] = useState([]);
     const [matLine, setMatLine] = useState(null);
@@ -125,4 +125,4 @@ function ProcessImage(mat) {
     };
 };
 
-export default ProcessImage;
+export default ImageProcessor;

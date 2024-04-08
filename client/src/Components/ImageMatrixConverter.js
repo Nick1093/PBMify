@@ -111,7 +111,6 @@ const getLabelLocs = (mat) => {
   let width = mat[0].length;
   let covered = Array.from({ length: height }, () => Array(width).fill(false));
   let labelLocs = [];
-
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       if (!covered[y][x]) {
