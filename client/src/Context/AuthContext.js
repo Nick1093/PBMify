@@ -47,6 +47,10 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
 
+  // const awaitUser = async () => {
+  //   return user;
+  // }
+
   // from sign in
   const signIn = async (email, password) => {
     try {
@@ -101,6 +105,7 @@ export const AuthContextProvider = ({ children }) => {
       unsubscribe();
     };
   }, []);
+
 
   return (
     <UserContext.Provider value={{ createUser, user, logout, signIn }}>

@@ -1,0 +1,27 @@
+.profile-nav {
+    position: fixed;
+    left: 0;
+    top: 40%;
+    height: 100%;
+    width: 200px;
+    overflow: auto;
+    padding: 1rem;
+}
+
+.profile-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.profile-list li {
+    padding: 1rem 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.profile-list li:hover {
+    background-color: #1a2c40;
+    border-radius: 20px;
+    color: white;
+
+}

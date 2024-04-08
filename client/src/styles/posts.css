@@ -1,0 +1,25 @@
+/* Style the li to be a relative container */
+li {
+    position: relative;
+}
+
+/* Position the button in the center of the li */
+.remove-post-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+}
+
+.remove-post-icon {
+    background-color: red;
+    display: inline-block;
+}
+
+
+
+/* Show the button when the li is hovered over */
+li:hover .remove-post-icon {
+    display: block;
+}
