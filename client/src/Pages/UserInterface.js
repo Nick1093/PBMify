@@ -314,8 +314,6 @@ const ImageMatrixConverter = () => {
     displayImageData(imageData);
   };
 
-
-
   return (
 
     
