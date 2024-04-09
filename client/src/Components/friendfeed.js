@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { UserAuth } from "../Context/AuthContext";
-import "../styles/friendfeedpage.css"
+import "../styles/friendfeedpage.css";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faDownload } from '@fortawesome/free-solid-svg-icons';
 
 const FriendFeedComponent = ({ currentUserID }) => {
     const { user } = UserAuth();
@@ -11,36 +13,45 @@ const FriendFeedComponent = ({ currentUserID }) => {
             try {
                 console.log("Fetching friend posts...");
                 console.log(user.uid)
-    
+
                 const response = await fetch(`http://localhost:8001/fetch-posts?userID=${user.uid}`);
                 const data = await response.json();
-    
+
                 console.log("Response data:", data);
-    
+
                 if (!response.ok) {
                     throw new Error("Failed to fetch friend posts");
                 }
-    
+
                 setFriendPosts(data);
-            } catch(error) {
+            } catch (error) {
                 console.error("Error fetching friend posts:", error);
             }
         };
-    
+
         fetchFriendPosts();
     }, []);
-    
+
 
 
     return (
-      <div>
-        <ul>
-            {friendPosts.map((post, index) => (
-                <li key={index}>{post}</li>
-            ))}
-        </ul>
-      </div>
-      );
+        <div>
+            <ul>
+                {friendPosts.map((post, index) => (
+                    <li key={index}>
+                        <div className="post-container">
+                            {<img src={`data:image/jpeg;base64,${post.imageURL}`} alt="post" className="post" />}
+                            <div className="save-button">
+                                <a href={`data:image/jpeg;base64,${post.imageURL}`} download="image.png"  >
+                                    <button> <FontAwesomeIcon icon={faDownload} /> </button>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
 };
 
 export default FriendFeedComponent;

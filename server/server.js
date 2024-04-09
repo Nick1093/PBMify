@@ -1,10 +1,10 @@
-const { v4: uuidv4 } = require("uuid");
 // Step 4: Set up a basic server with Express.js
 const express = require("express");
-const cors = require("cors");
 const app = express();
 const port = 8001;
 const bodyParser = require("body-parser");
+const cors = require('cors');
+
 const {
   initializeApp,
   applicationDefault,
@@ -24,10 +24,6 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
-// parse application/x-www-form-urlencoded
-app.use(express.urlencoded({ extended: false }));
-// parse application/json
-app.use(express.json());
 
 // ---------------------------------- Initialize Firebase Admin SDK ----------------------------------
 const admin = require("firebase-admin");
@@ -86,8 +82,8 @@ app.post("/remove-post", async (req, res) => {
   }
 });
 
-// Create a new post
-app.post("/create-post", async (req, res) => {
+// Create a new post for the adding friend function
+app.post("/add-friend", async (req, res) => {
   // Get data from the front end
   const { userId, imageURL, title } = req.body; // Assuming you're sending a title along with userId and image
 
@@ -127,16 +123,6 @@ app.post("/create-post", async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-//<<<<<<< HEAD
-//=======
-=======
-
->>>>>>> bfee62a44e6db3e4e21be97e944ed809b066273d
-=======
-
->>>>>>> 05223b484f0309d259d28ff3c39ca6659c84d176
 app.get("/my-posts", async (req, res) => {
   // Get the user ID from the query string
   const { userId } = req.query;
@@ -167,7 +153,7 @@ app.get("/my-posts", async (req, res) => {
   }
 });
 
-//>>>>>>> a7b3b45c0e1ab519429d98290a87b0e2e6024a7c
+
 app.get("/fetch-posts", async (req, res) => {
   // get friends posts
   //get UserID
@@ -176,7 +162,8 @@ app.get("/fetch-posts", async (req, res) => {
   console.log("---------------------------");
 
   //Reference the 'Users' collection
-  const userDoc = db.collection("Users").doc(userID);
+  const usersRef = db.collection("Users");
+  const userDoc = usersRef.doc(userID);
 
   //This is the snapshot
   const docSnapshot = await userDoc.get();
@@ -192,34 +179,37 @@ app.get("/fetch-posts", async (req, res) => {
       res.status(201).send({ message: "User not found", userID: userID });
     }
 
-    // Log the entire document data to verify its contents
-    console.log("Document data:", docSnapshot.data());
-
     // Extract friends array from user document
     const friendsArray =
       docSnapshot.data().friends || docSnapshot.get("friends") || [];
-    console.log("YEEEEEHAW");
+    // console.log("YEEEEEHAW");
+    // console.log("Friends Array: ", friendsArray);
 
     //array to store friends
     let allPosts = [];
 
     // Iterate through each friend
-    for (let friendId of friendsArray) {
-      console.log("friendId:", friendId);
+    // const friendIDs = friendsArray.map(friend => friend.userID);
+
+    for (friendID of friendsArray) {
+      console.log("friendId:", friendID);
       // Get the document for the friend
-      const friendDoc = await db.collection("Users").doc(friendId).get();
+      const friendDoc = await usersRef.doc(friendID).get();
 
       if (friendDoc.exists) {
         // Retrieve the posts array from the friend document
-        const friendPosts = (await friendDoc.data().posts) || [];
+        const friendPosts = await friendDoc.data().posts;
+        console.log("Friend Posts: ", friendPosts);
 
-        // Add the friend's posts to the allPosts array
         allPosts = allPosts.concat(friendPosts);
+        console.log("New All Posts: ", allPosts);
       } else {
         // if not work
         console.log(`Friend document for user ${friendId} does not exist`);
       }
     }
+
+    console.log("All Posts: ", allPosts);
     res.status(201).send(allPosts);
   } catch (error) {
     console.error("Error adding post to user:", error);
@@ -249,12 +239,13 @@ app.get("/get-friends", async (req, res) => {
       console.log("Used document not found", userID);
       res.status(404).send({ message: "User not found", userID: userID });
     } else {
-      const friendsArray = docSnapshot.data().friends || [];
-      res.status(200).send(friendsArray);
+      return res.status(400).send({ "message": "User is already in the friend list" });
     }
+
+    res.status(200).send({ "message": "Friend added successfully" });
   } catch (error) {
-    console.error("error getting posts:", error);
-    res.status(500).send("An error occurred");
+    console.error("Error adding friend:", error);
+    res.status(500).send("Internal server error");
   }
 });
 
