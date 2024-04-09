@@ -21,7 +21,7 @@ const ViewFriends = () => {
         getFriends();
     }, []);
 
-    const searchFriends = friends.filter(friend => friend.email && friend.email.toLowerCase().includes(search.toLowerCase()));
+    const searchFriends = friends.length ? friends.filter(friend => friend.email && friend.email.toLowerCase().includes(search.toLowerCase())) : [];
 
     return (
         <div>
