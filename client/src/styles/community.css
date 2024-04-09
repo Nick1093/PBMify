@@ -1,0 +1,27 @@
+.h2 {
+    margin-top: 20px;
+}
+
+.search-bar {
+    margin-top: 20px;
+    width: 300px;
+    /* Make the search bar bigger */
+    height: 40px;
+    border-radius: 20px;
+    /* Make the search bar a rounder rectangle */
+    padding: 20px;
+    /* Make room for the magnifying glass icon */
+}
+
+.add-friend-button {
+    display: block;
+    margin: 20px auto;
+    border-radius: 20px;
+    padding: 10px 20px;
+    background-color: lightgreen;
+}
+
+.add-friend-button:hover {
+    background-color: darkgreen;
+    color: white;
+}

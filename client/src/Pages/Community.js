@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { UserAuth } from "../Context/AuthContext";
-
+import Navbar from '../Components/navbar';
+import "../styles/community.css"
+import FriendFeedComponent from '../Components/friendfeed';
 
 const Community = () => {
     const [email, setEmail] = useState('');
@@ -42,18 +44,21 @@ const Community = () => {
 
     return (
         <div>
+            <Navbar></Navbar>
             <h2>Add Friend</h2>
-            <input
-                type="email"
+            <input className="search-bar"
+                type="text"
                 placeholder="Enter friend's email"
                 value={email}
                 onChange={handleEmailChange}
             />
-            <button onClick={handleAddFriend} disabled={loading}>
+            <button className="add-friend-button" onClick={handleAddFriend} disabled={loading}>
                 {loading ? 'Adding...' : 'Add Friend'}
             </button>
             {message && message.includes("Error") && <p style={{ color: 'red' }}>{message}</p>}
             {message && !message.includes("Error") && <p style={{ color: 'green' }}>{message}</p>}
+            <h1>Friend Feed</h1>
+            <FriendFeedComponent /> {/* Pass currentUserID prop */}
         </div>
     );
 }

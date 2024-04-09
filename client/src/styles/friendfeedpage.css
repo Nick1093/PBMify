@@ -1,20 +1,3 @@
-.post-container {
-  position: relative;
-  display: inline-block;
-  width: 100%;
-  max-width: 300px;
-  /* adjust as needed */
-  margin: 10px;
-  /* adjust as needed */
-}
-
-.post {
-  display: block;
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-}
-
 .save-button {
   position: absolute;
   top: 50%;
@@ -24,10 +7,36 @@
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
+.post-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 400px;
+  height: auto;
+  margin: 0 auto;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  background-color: #fff;
+}
+
+.post-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.post {
+  max-width: 100%;
+  height: auto;
+}
+
+
 .save-button button {
   font-size: 3em;
 }
-
 
 .post-container:hover .save-button {
   opacity: 1;
@@ -38,4 +47,15 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  position: relative;
+}
+
+.control-arrow {
+  display: none;
+}
+
+/* Style for the next arrow */
+.control-next.control-arrow {
+  right: 10px;
+  /* Position from the right */
 }

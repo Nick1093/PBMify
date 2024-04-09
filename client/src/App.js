@@ -11,8 +11,8 @@ import ProtectedRoute from "./Components/ProtectedRoute";
 import UserInterface from "./Pages/UserInterface";
 import FriendFeedPage from "./Pages/FriendFeedPage";
 import Profile from "./Pages/Profile";
-
 import Community from "./Pages/Community";
+import "../src/styles/global.css";
 
 
 const App = () => {
@@ -24,7 +24,7 @@ const App = () => {
           <Route path="/authentication" element={<Signin />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/community" element={<Community></Community>} />
+          <Route path="/community" element={<Community />} />
           <Route
             path="/PBMify"
             element={
