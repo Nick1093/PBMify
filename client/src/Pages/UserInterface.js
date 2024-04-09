@@ -235,6 +235,20 @@ const UserInterface = () => {
     processFile(file);
   };
 
+  const saveImage = async () => {
+    try {
+      console.log("Fetching your posts...");
+      console.log(user.uid);
+
+      const response = await fetch(
+        `http://localhost:8001/my-posts?userId=${user.uid}`
+      );
+      const data = await response.json();
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    }
+  };
+
   const imageDataToSimpMat = (imgData, palette) => {
     const width = imgData.width;
     const height = imgData.height;
@@ -340,44 +354,44 @@ const UserInterface = () => {
     ctx.putImageData(imageData, 0, 0);
   };
 
-const displayColorPalette = () => {
-  const canvas = canvasRef.current;
-  const ctx = canvas.getContext("2d");
-  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  const pixelData = imageData.data;
-  const colorPalette = [];
+  const displayColorPalette = () => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const pixelData = imageData.data;
+    const colorPalette = [];
 
-  // Iterate through each pixel using a for loop
-  for (let i = 0; i < pixelData.length; i += 4) {
-    // Extract color information of the pixel
-    const red = pixelData[i];
-    const green = pixelData[i + 1];
-    const blue = pixelData[i + 2];
-    const alpha = pixelData[i + 3];
+    // Iterate through each pixel using a for loop
+    for (let i = 0; i < pixelData.length; i += 4) {
+      // Extract color information of the pixel
+      const red = pixelData[i];
+      const green = pixelData[i + 1];
+      const blue = pixelData[i + 2];
+      const alpha = pixelData[i + 3];
 
-    // Define the colour strings (RGB and the opacity)
-    const color = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+      // Define the colour strings (RGB and the opacity)
+      const color = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 
-    // skip duplicate colours
-    if (!colorPalette.includes(color)) {
-      colorPalette.push(color);
+      // skip duplicate colours
+      if (!colorPalette.includes(color)) {
+        colorPalette.push(color);
+      }
     }
-  }
 
-  // Clear previous color palette if it exists
-  const paletteContainer = document.getElementById("colorPaletteContainer");
-  paletteContainer.innerHTML = "";
+    // Clear previous color palette if it exists
+    const paletteContainer = document.getElementById("colorPaletteContainer");
+    paletteContainer.innerHTML = "";
 
-  // Display the color palette (both in console logs)
-  colorPalette.forEach((color) => {
-    const colorBox = document.createElement("div");
-    colorBox.style.backgroundColor = color;
-    colorBox.style.width = "30px";
-    colorBox.style.height = "30px";
-    colorBox.style.margin = "5px";
-    paletteContainer.appendChild(colorBox);
-  });
-};
+    // Display the color palette (both in console logs)
+    colorPalette.forEach((color) => {
+      const colorBox = document.createElement("div");
+      colorBox.style.backgroundColor = color;
+      colorBox.style.width = "30px";
+      colorBox.style.height = "30px";
+      colorBox.style.margin = "5px";
+      paletteContainer.appendChild(colorBox);
+    });
+  };
 
   const displayOutlinedImage = () => {
     const canvas = canvasRef.current;
@@ -405,7 +419,6 @@ const displayColorPalette = () => {
     labelLocs.forEach((labelLoc) => {
       ctx.fillText(labelLoc.value + 1, labelLoc.x - 3, labelLoc.y + 4);
     });
-
   };
 
   const removePhoto = () => {
@@ -413,7 +426,6 @@ const displayColorPalette = () => {
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
     setImageLoaded(false); // Reset image loaded state
-
   };
 
   return (
@@ -464,7 +476,6 @@ const displayColorPalette = () => {
         >
           View Smoothed Matrix
         </button>
-        
       </div>
       <div>
         <button
@@ -477,22 +488,25 @@ const displayColorPalette = () => {
       </div>
 
       <div>
-      <button
-        style={{ marginTop: "100px" }}
-        id="View Color Palette"
-        onClick={() => displayColorPalette()}
-      >
-        View Color Palette
-      </button>
-    </div>
+        <button
+          style={{ marginTop: "100px" }}
+          id="View Color Palette"
+          onClick={() => displayColorPalette()}
+        >
+          View Color Palette
+        </button>
+      </div>
 
-    {(imageLoaded || !imageLoaded) && (
+      {(imageLoaded || !imageLoaded) && (
         <div style={{ textAlign: "center" }}>
           <button onClick={removePhoto}>Remove Photo</button>
         </div>
       )}
 
-    <div id="colorPaletteContainer" style={{ display: "flex", flexWrap: "wrap" }}></div>
+      <div
+        id="colorPaletteContainer"
+        style={{ display: "flex", flexWrap: "wrap" }}
+      ></div>
 
       {/* Additional UI components to display matrix and color palette */}
     </>
