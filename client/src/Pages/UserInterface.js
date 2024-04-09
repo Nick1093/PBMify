@@ -1,5 +1,4 @@
 
-
 import React, { useRef, useEffect, useState } from "react";
 import { extractColors } from "extract-colors";
 import NavBar from "../Components/navbar";
@@ -320,7 +319,9 @@ const ImageMatrixConverter = () => {
 
   return (
     <>
+
       <NavBar />
+
       <div
         onDrop={onDrop}
         onDragOver={onDragOver}
