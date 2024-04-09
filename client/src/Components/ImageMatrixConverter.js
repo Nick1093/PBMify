@@ -283,7 +283,7 @@ const ImageMatrixConverter = () => {
     return neighbors.some((n) => Math.abs(n - val) > threshold);
   };
 
-  const displayProcessedMatrix = () => {
+/*  const displayProcessedMatrix = () => {
     const outputCanvas = canvasRef.current; // Using the same canvas to display the processed image
     if (outputCanvas && processedMatrix.length > 0 && colorPalette.length > 0) {
       const ctx = outputCanvas.getContext("2d");
@@ -291,7 +291,7 @@ const ImageMatrixConverter = () => {
       const imageData = matrixToImageData(processedMatrix, colorPalette);
       ctx.putImageData(imageData, 0, 0);
     }
-  };
+  };*/
 
   const displayImageData = (imageData) => {
     const canvas = canvasRef.current;
