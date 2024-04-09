@@ -73,3 +73,8 @@
   position: relative;
   width: 100%;
 }
+
+.about-image {
+  display: flex;
+  height: auto;
+}

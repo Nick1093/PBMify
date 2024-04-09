@@ -32,7 +32,6 @@ const Home = () => {
       </div>
       <div className="about-container">
         <h1 className="about-text">Hear from our team</h1>
-        <img src={box} alt="WFN Projects Team" style={{ width: "300px", height: "auto" }} />
         <p className="about-body-text">Hi! Thank you for being here. We're a group of students at Western who have spent the past bit working on coding our first fullstack project. None of this would have been possible with our mentor, Nick. Thank you Nick for all the hours, gentle parenting, tech advice, and FUN. You've been such a defining part of our university experience and constantly inspire us to be better. Second of all, thank you to the Western Founders network for your support and bringing us together! Finally we can't forget to thank Ivey Business school for being our home.  </p>
       </div>
       <FriendFeedComponent />
