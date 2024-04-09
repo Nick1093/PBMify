@@ -2,15 +2,11 @@
 import React, { useRef, useEffect, useState } from "react";
 import { extractColors } from "extract-colors";
 import NavBar from "../Components/navbar";
-<<<<<<< HEAD
 import cloneDeep from 'lodash/cloneDeep';
-
+import "../styles/UserInterface.css";
 import _ from 'lodash';
 
 
-=======
-import "../styles/UserInterface.css";
->>>>>>> eed2c9fdb90a58d251fffdde60acd5b015dcc6de
 
 // Define the getNearest function that takes a color palette and a target color
 const getNearest = (palette, color) => {
@@ -177,8 +173,6 @@ const UserInterface = () => {
   const [processedMatrix, setProcessedMatrix] = useState([]);
   const [colorPalette, setColorPalette] = useState([]);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [imageData, setImageData] = useState({});
-  const [popupMessage, setPopupMessage] = useState('');
 
   const processFile = async (file) => {
     if (file && file.type.startsWith("image/")) {
@@ -336,7 +330,7 @@ const UserInterface = () => {
     
   }
 
-  /* const displayProcessedMatrix = () => {
+  const displayProcessedMatrix = () => {
     const outputCanvas = canvasRef.current; // Using the same canvas to display the processed image
     if (outputCanvas && processedMatrix.length > 0 && colorPalette.length > 0) {
       const ctx = outputCanvas.getContext("2d");
@@ -345,7 +339,6 @@ const UserInterface = () => {
       ctx.putImageData(imageData, 0, 0);
     }
   };
-  */
 
   const displayImageData = (imageData) => {
     const canvas = canvasRef.current;
@@ -367,84 +360,53 @@ const UserInterface = () => {
     displayImageData(imageData);
   };
 
-  const removePhoto = () => {
-    const canvas = canvasRef.current;
-    if (canvas) {
-      const ctx = canvas.getContext("2d");
-      ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
-    }
-    setImageLoaded(false); // Reset image loaded state
-    setMatrix([]); // Clear the matrix state
-    setProcessedMatrix([]); // Clear the processed matrix state
-    fileInputRef.current.value = ''; // Reset the file input
-  };
+
 
   return (
     <>
+
       <NavBar />
-  
-      &nbsp;
-      <div className="DropOrClick"style={{ textAlign: "center" }}>
-        Drop or click to upload an image
-      </div>
+
       <div
         onDrop={onDrop}
         onDragOver={onDragOver}
         onClick={onClick}
         style={{
-          width: "90%",
+          width: "100%",
           height: "500px",
-          border: "4px dashed #aaa",
+          border: "1px solid black",
           cursor: "pointer",
-          position: "center",
-          margin: "20px auto",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "column",
+          position: "relative",
         }}
       >
-        {/* Conditionally render the instruction text based on imageLoaded */}
-        {!imageLoaded && (
-          <div style={{ textAlign: "center" }}>
-            <button className="browse-button">Browse</button>
-          </div>
-        )}
-  
+        Drop or click to upload an image
         <input
           type="file"
           ref={fileInputRef}
           onChange={onFileChange}
           style={{ display: "none" }}
           accept="image/*"
-          onClick={(event) => (event.target.value = null)} // Add this line
         />
-  
         <canvas
           ref={canvasRef}
           style={{
             display: imageLoaded ? "block" : "none",
             maxWidth: "100%",
-            maxHeight: "90%",
+            maxHeight: "500px",
           }}
         />
+
+        
+
       </div>
-  
-      <div style={{ textAlign: "center", marginTop: "10px" }}>
-        <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
-          {(imageLoaded || !imageLoaded) && (
-            <button className="blue-button" onClick={removePhoto}>Remove Photo</button>
-          )}
-          <button className="blue-button" id="Matrix to image" onClick={() => processMatrix()}>
-            Smooooothe it
-          </button>
-        </div>
+
+      <div>
+        <button id="Matrix to image" onClick={() => processMatrix()}>Proceed Matrix</button>
       </div>
-      <p>&nbsp;</p>
+      {/* Additional UI components to display matrix and color palette */}
     </>
-    
   );
-          };  
+};
 
 export default UserInterface;
 
