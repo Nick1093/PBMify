@@ -1,7 +1,5 @@
-const { v4: uuidv4 } = require("uuid");
 // Step 4: Set up a basic server with Express.js
 const express = require("express");
-const cors = require("cors");
 const app = express();
 const port = 8001;
 const bodyParser = require("body-parser");
@@ -24,10 +22,6 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
-// parse application/x-www-form-urlencoded
-app.use(express.urlencoded({ extended: false }));
-// parse application/json
-app.use(express.json());
 
 // ---------------------------------- Initialize Firebase Admin SDK ----------------------------------
 const admin = require("firebase-admin");
@@ -86,8 +80,8 @@ app.post("/remove-post", async (req, res) => {
   }
 });
 
-// Create a new post
-app.post("/create-post", async (req, res) => {
+// Create a new post for the adding friend function
+app.post("/add-friend", async (req, res) => {
   // Get data from the front end
   const { userId, imageURL, title } = req.body; // Assuming you're sending a title along with userId and image
 
@@ -127,7 +121,6 @@ app.post("/create-post", async (req, res) => {
   }
 });
 
-
 app.get("/my-posts", async (req, res) => {
   // Get the user ID from the query string
   const { userId } = req.query;
@@ -158,6 +151,7 @@ app.get("/my-posts", async (req, res) => {
   }
 });
 
+
 app.get("/fetch-posts", async (req, res) => {
   // get friends posts
   //get UserID
@@ -183,8 +177,8 @@ app.get("/fetch-posts", async (req, res) => {
       res.status(201).send({ message: "User not found", userID: userID });
     }
 
-    // Log the entire document data to verify its contents
-    console.log("Document data:", docSnapshot.data());
+    // Assuming there's only one document with a given email (unique emails)
+    const userDoc = userSnapshot.docs[0];
 
     // Extract friends array from user document
     const friendsArray =
@@ -246,12 +240,13 @@ app.get("/get-friends", async (req, res) => {
       console.log("Used document not found", userID);
       res.status(404).send({ message: "User not found", userID: userID });
     } else {
-      const friendsArray = docSnapshot.data().friends || [];
-      res.status(200).send(friendsArray);
+      return res.status(400).send({ "message": "User is already in the friend list" });
     }
+
+    res.status(200).send({ "message": "Friend added successfully" });
   } catch (error) {
-    console.error("error getting posts:", error);
-    res.status(500).send("An error occurred");
+    console.error("Error adding friend:", error);
+    res.status(500).send("Internal server error");
   }
 });
 
