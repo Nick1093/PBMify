@@ -151,6 +151,24 @@ const coverRegion = (covered, region) => {
   }
 };
 
+const pairColorsWithEquations = (colorPalette) => {
+  // Check if colorPalette is defined and has elements
+  if (!colorPalette || colorPalette.length === 0) {
+    console.error('colorPalette is undefined or empty');
+    return [];
+  }
+
+  // Mapping over the colorPalette to pair each color with an equation
+  const pairedList = colorPalette.map((color, index) => {
+    // Adjusting index to match numbers 1 through 20 for getRandomEquation
+    const numberForEquation = (index % 20) + 1; // Use modulo to ensure number is between 1 and 20
+    const equation = getRandomEquation(numberForEquation);
+    return { color, equation };
+  });
+
+  return pairedList;
+}
+
 const UserInterface = () => {
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -352,46 +370,46 @@ const UserInterface = () => {
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.putImageData(imageData, 0, 0);
-  };
+  }
 
-  const displayColorPalette = () => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const pixelData = imageData.data;
-    const colorPalette = [];
+  // const displayColorPalette = () => {
+  //   const canvas = canvasRef.current;
+  //   const ctx = canvas.getContext("2d");
+  //   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  //   const pixelData = imageData.data;
+  //   const colorPalette = [];
 
-    // Iterate through each pixel using a for loop
-    for (let i = 0; i < pixelData.length; i += 4) {
-      // Extract color information of the pixel
-      const red = pixelData[i];
-      const green = pixelData[i + 1];
-      const blue = pixelData[i + 2];
-      const alpha = pixelData[i + 3];
+  //   // Iterate through each pixel using a for loop
+  //   for (let i = 0; i < pixelData.length; i += 4) {
+  //     // Extract color information of the pixel
+  //     const red = pixelData[i];
+  //     const green = pixelData[i + 1];
+  //     const blue = pixelData[i + 2];
+  //     const alpha = pixelData[i + 3];
 
-      // Define the colour strings (RGB and the opacity)
-      const color = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+  //     // Define the colour strings (RGB and the opacity)
+  //     const color = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 
-      // skip duplicate colours
-      if (!colorPalette.includes(color)) {
-        colorPalette.push(color);
-      }
-    }
+  //     // skip duplicate colours
+  //     if (!colorPalette.includes(color)) {
+  //       colorPalette.push(color);
+  //     }
+  //   }
 
-    // Clear previous color palette if it exists
-    const paletteContainer = document.getElementById("colorPaletteContainer");
-    paletteContainer.innerHTML = "";
+  //   // Clear previous color palette if it exists
+  //   const paletteContainer = document.getElementById("colorPaletteContainer");
+  //   paletteContainer.innerHTML = "";
 
-    // Display the color palette (both in console logs)
-    colorPalette.forEach((color) => {
-      const colorBox = document.createElement("div");
-      colorBox.style.backgroundColor = color;
-      colorBox.style.width = "30px";
-      colorBox.style.height = "30px";
-      colorBox.style.margin = "5px";
-      paletteContainer.appendChild(colorBox);
-    });
-  };
+  //   // Display the color palette (both in console logs)
+  //   colorPalette.forEach((color) => {
+  //     const colorBox = document.createElement("div");
+  //     colorBox.style.backgroundColor = color;
+  //     colorBox.style.width = "30px";
+  //     colorBox.style.height = "30px";
+  //     colorBox.style.margin = "5px";
+  //     paletteContainer.appendChild(colorBox);
+  //   });
+  // };
 
   const displayOutlinedImage = () => {
     const canvas = canvasRef.current;
@@ -400,71 +418,195 @@ const UserInterface = () => {
       console.error("Matrix or color palette is not set.");
       return;
     }
-
+  
     const bw = [
       { red: 255, green: 255, blue: 255 },
       { red: 0, green: 0, blue: 0 },
     ];
-
+  
     const outlinedData = matrixToImageData(processedMatrix, bw);
-
+  
     // console.log(outlinedData);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.putImageData(outlinedData, 0, 0);
-
+  
     let gray = 128; // Example: mid-tone gray, adjust as needed
-
+  
     ctx.font = "12px Georgia";
     ctx.fillStyle = `rgb(${gray}, ${gray}, ${gray})`; // Template literal for easier readability
     labelLocs.forEach((labelLoc) => {
       ctx.fillText(labelLoc.value + 1, labelLoc.x - 3, labelLoc.y + 4);
     });
+  
+    /* Check if the color palette container exists and remove it if it does
+    const paletteContainer = document.getElementById("colorPaletteContainer");
+    if (paletteContainer) {
+      paletteContainer.remove();
+    }*/
   };
+  
+  const displayColorPalette = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return; // Ensure the canvas ref is available
+    const ctx = canvas.getContext("2d");
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    
+    if (!imageData.data.some((value) => value !== 0)) {
+      return; // Exit if the canvas is empty
+    }
+  
+    const pixelData = imageData.data;
+    const colorPalette = [];
+  
+    for (let i = 0; i < pixelData.length; i += 4) {
+      const red = pixelData[i];
+      const green = pixelData[i + 1];
+      const blue = pixelData[i + 2];
+      const alpha = pixelData[i + 3] / 255; // Adjust alpha for CSS use
+      const color = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+  
+      if (!colorPalette.includes(color)) {
+        colorPalette.push(color);
+      }
+    }
+  
+    let paletteContainer = document.getElementById("colorPaletteContainer");
+    if (!paletteContainer) {
+      paletteContainer = document.createElement("div");
+      paletteContainer.id = "colorPaletteContainer";
+      document.body.appendChild(paletteContainer);
+    }
+  
+    paletteContainer.innerHTML = "";
+  
+    const paletteMessage = document.createElement("div");
+    paletteMessage.textContent = "Color Palette";
+    paletteMessage.style.textAlign = "center";
+    paletteContainer.appendChild(paletteMessage);
+  
+    const paletteWrapper = document.createElement("div");
+    paletteWrapper.style.display = "flex";
+    paletteWrapper.style.flexWrap = "wrap"; // Allow wrapping for multiple items
+    paletteWrapper.style.justifyContent = "center";
+    paletteContainer.appendChild(paletteWrapper);
+  
+    // Assume pairColorsWithEquations function is available and returns paired list
+    const pairedList = colorPalette.map((color, index) => {
+      // Add 1 to the index for the equation number to match the intended solution
+      const equationNumber = index + 1;
+      const equation = getRandomEquation(equationNumber);
+      // Ensure the equation includes the result, which should match equationNumber
+      return { color, equation: `${equation} ${equationNumber}` }; // Concatenate the result here
+    });
+
+    pairedList.forEach((item, index) => {
+      const colorBox = document.createElement("div");
+      colorBox.style.backgroundColor = item.color;
+      colorBox.style.width = "100px"; // Increased width for better visibility
+      colorBox.style.height = "60px"; // Increased height for additional content
+      colorBox.style.margin = "10px";
+      colorBox.style.border = "1px solid black";
+      colorBox.style.position = "relative";
+      colorBox.style.display = "flex";
+      colorBox.style.flexDirection = "column";
+      colorBox.style.alignItems = "center";
+      colorBox.style.justifyContent = "center";
+  
+      const equationText = document.createElement("span");
+      equationText.textContent = item.equation; 
+      equationText.style.color = "black";
+      equationText.style.fontSize = "12px";
+      equationText.style.textAlign = "center";
+      equationText.style.marginBottom = "5px"; // Margin for spacing between color and equation
+  
+      const indexText = document.createElement("span");
+      indexText.textContent = `Color ${index + 1}`;
+      indexText.style.color = "black";
+      indexText.style.fontSize = "10px";
+      indexText.style.textShadow = "-1px 0 white, 0 1px white, 1px 0 white, 0 -1px white";
+  
+      colorBox.appendChild(equationText); // Append equation text first
+      colorBox.appendChild(indexText); // Then, append the index text
+      paletteWrapper.appendChild(colorBox);
+    });
+};
+
+  
+  
+  
 
   const removePhoto = () => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
     setImageLoaded(false); // Reset image loaded state
+    //Check if the color palette container exists and remove it if it does
+    const paletteContainer = document.getElementById("colorPaletteContainer");
+    if (paletteContainer) {
+      paletteContainer.remove();
+    }
+
   };
 
   return (
     <>
       <NavBar />
-
+      &nbsp;
+      <div className="DropOrClick" style={{ textAlign: "center", fontFamily: "'Climate Crisis', sans-serif" }}>
+        
+        Drop or click to upload an image
+      </div>
       <div
         onDrop={onDrop}
         onDragOver={onDragOver}
         onClick={onClick}
         style={{
-          width: "100%",
+          width: "90%",
           height: "500px",
-          border: "1px solid black",
+          border: "4px dashed #aaa",
           cursor: "pointer",
-          position: "relative",
+          position: "relative", // Change to relative or absolute
+          margin: "20px auto", // Center horizontally
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "column",
         }}
       >
-        Drop or click to upload an image
+        {/* Conditionally render the instruction text based on imageLoaded */}
+        {!imageLoaded && (
+          <div style={{ textAlign: "center"}}>
+            <button className="browse-button">Browse files</button>
+          </div>
+        )}
+  
         <input
           type="file"
           ref={fileInputRef}
           onChange={onFileChange}
           style={{ display: "none" }}
           accept="image/*"
+          onClick={(event) => (event.target.value = null)} // Add this line
         />
-        <div
-          className="canvas-container"
-          ng-show="step == 'select' || step == 'process'"
-        >
-          <canvas
-            className="canvas"
-            ref={canvasRef}
-            style={{
-              display: imageLoaded ? "block" : "none",
-              maxWidth: "100%",
-              maxHeight: "500px",
-            }}
-          />
+  
+        <canvas
+          ref={canvasRef}
+          style={{
+            display: imageLoaded ? "block" : "none",
+            maxWidth: "100%",
+            maxHeight: "90%",
+          }}
+        />
+      </div>
+  
+      {/* Button container div */}
+      <div style={{ textAlign: "center", marginTop: "10px" }}>
+        <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
+          {(imageLoaded || !imageLoaded) && (
+            <button className="blue-button" onClick={removePhoto}>Remove Photo</button>
+          )}
+          <button className="blue-button" id="Matrix to image" onClick={() => displaySmoothedImage()}>View Smoothed Image</button>
+          <button className="blue-button" id="Outlined image" onClick={() => displayOutlinedImage()}>View Outlined Image</button>
         </div>
       </div>
 
@@ -511,6 +653,7 @@ const UserInterface = () => {
       {/* Additional UI components to display matrix and color palette */}
     </>
   );
+  
 };
 
 export default UserInterface;
