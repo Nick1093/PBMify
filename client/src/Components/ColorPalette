@@ -1,0 +1,17 @@
+import React from 'react';
+
+const ColorPalette = ({ palette }) => {
+  return (
+    <div className="color-palette">
+      {palette.map((color, index) => (
+        <div
+          key={index}
+          className="color"
+          style={{ backgroundColor: `rgb(${color.r}, ${color.g}, ${color.b})` }}
+        ></div>
+      ))}
+    </div>
+  );
+};
+
+export default ColorPalette;
