@@ -306,12 +306,13 @@ app.get("/get-friends", async (req, res) => {
       console.log("Used document not found", userID);
       res.status(404).send({ message: "User not found", userID: userID });
     } else {
-      return res.status(400).send({ "message": "User is already in the friend list" });
+      const friends = await docSnapshot.data().friends || [];
+      console.log("Friends: ", friends);
+      res.status(200).send({ userFriends: friends });
     }
 
-    res.status(200).send({ "message": "Friend added successfully" });
   } catch (error) {
-    console.error("Error adding friend:", error);
+    console.error("Error finding friends:", error);
     res.status(500).send("Internal server error");
   }
 });

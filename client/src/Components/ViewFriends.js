@@ -6,14 +6,13 @@ const ViewFriends = () => {
     const [friends, setFriends] = useState([]);
     const { user } = UserAuth();
     const [search, setSearch] = useState('');
-
     useEffect(() => {
         const getFriends = async () => {
             try {
                 const response = await fetch(`http://localhost:8001/get-friends?userID=${user.uid}`);
                 const data = await response.json();
                 console.log(data);
-                setFriends(data);
+                setFriends(data.userFriends);
             } catch (e) {
                 console.log(e);
             }
@@ -21,7 +20,6 @@ const ViewFriends = () => {
         getFriends();
     }, []);
 
-    const searchFriends = friends.length ? friends.filter(friend => friend.email && friend.email.toLowerCase().includes(search.toLowerCase())) : [];
 
     return (
         <div>
@@ -29,8 +27,8 @@ const ViewFriends = () => {
             <h2>Friends</h2>
             <input type="text" className="search-bar" placeholder="Search Your Friends" value={search} onChange={(e) => setSearch(e.target.value)} />
             <ul>
-                {searchFriends.map((friend) => {
-                    return <li key={friend.userID}>{friend.email}</li>
+                {friends.map((friend) => {
+                    return <li className="friend" key={friend.UserId}>{friend.friendEmail}</li>
                 })}
             </ul>
 
