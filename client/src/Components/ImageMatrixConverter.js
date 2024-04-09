@@ -65,45 +65,96 @@ const matrixToImageData = (mat, palette) => {
   return imageData;
 };
 
-const getRegion = (mat, x, y, covered) => {
-  let queue = [[x, y]];
-  let region = { value: mat[y][x], pixels: [] };
+const neighborsSame = (mat, x, y) => {
+  let height = mat.length;
+  let width = mat[0].length;
+  let val = mat[y][x];
+  let xRel = [1, 0];
+  let yRel = [0, 1];
 
-  while (queue.length > 0) {
-    let [cx, cy] = queue.shift();
-
-    if (covered[cy][cx] || mat[cy][cx] !== region.value) continue;
-
-    covered[cy][cx] = true;
-    region.pixels.push({ x: cx, y: cy });
-
-    [
-      [1, 0],
-      [-1, 0],
-      [0, 1],
-      [0, -1],
-    ].forEach(([dx, dy]) => {
-      let nx = cx + dx,
-        ny = cy + dy;
-      if (
-        nx >= 0 &&
-        nx < mat[0].length &&
-        ny >= 0 &&
-        ny < mat.length &&
-        !covered[ny][nx]
-      ) {
-        queue.push([nx, ny]);
+  for (let i = 0; i < xRel.length; i++) {
+    let xx = x + xRel[i];
+    let yy = y + yRel[i];
+    if (xx >= 0 && xx < width && yy >= 0 && yy < height) {
+      if (mat[yy][xx] !== val) {
+        return false;
       }
-    });
+    }
+  }
+  return true;
+}
+
+const outline = (mat) => {
+  let height = mat.length;
+  let width = mat[0].length;
+  let line = Array.from({ length: height }, () => new Array(width).fill(0));
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      line[y][x] = neighborsSame(mat, x, y) ? 0 : 1;
+    }
   }
 
+  return line;
+  
+}
+
+const getRegion = (mat, x, y, cov) => {
+  const covered = cov.map(row => [...row]);
+  const region = {value: mat[y][x], x: [], y: []};
+  const value = mat[y][x];
+
+  const queue = [[x, y]];
+
+  while (queue.length > 0) {
+    const [cx, cy] = queue.shift();
+
+    if (!covered[cy][cx] && mat[cy][cx] === value) {
+      region.x.push(cx);
+      region.y.push(cy);
+      covered[cy][cx] = true;
+
+      if (cx > 0) queue.push([cx - 1, cy]);
+      if (cx < mat[0].length - 1) queue.push([cx + 1, cy]);
+      if (cy > 0) queue.push([cx, cy - 1]);
+      if (cy < mat.length - 1) queue.push([cx, cy + 1]);
+    }
+  }
   return region;
-};
+}
+
+const getBelowValue = (mat, region) => {
+  let x = region.x[0];
+  let y = region.y[0];
+  while (mat[y][x] === region.value) {
+      y++;
+  }
+  return mat[y][x];
+}
+
+const removeRegion = (mat, region) => {
+  console.log("REGION REMOVED:", region);
+  let newValue
+  if (region.y[0] > 0) {
+    newValue = mat[region.y[0] - 1][region.x[0]]; // assumes first pixel in list is topmost then leftmost of region.
+  } else {
+    newValue = getBelowValue(mat, region);
+  }
+  for (let i = 0; i < region.x.length; i++) {
+    mat[region.y[i]][region.x[i]] = newValue;
+  }
+}
 
 const coverRegion = (covered, region) => {
-  region.pixels.forEach(({ x, y }) => {
-    covered[y][x] = true;
-  });
+  for(let i = 0; i < region.x.length; i++) {
+    const x = region.x[i];
+    const y = region.y[i];
+    if(covered[y] !== undefined && covered[y][x] !== undefined) {
+      covered[y][x] = true;
+    } else {
+      console.error('covered[y] or covered[x] is undefined!!');
+    }
+  }
 };
 
 const getLabelLocs = (mat) => {
@@ -111,19 +162,29 @@ const getLabelLocs = (mat) => {
   let width = mat[0].length;
   let covered = Array.from({ length: height }, () => Array(width).fill(false));
   let labelLocs = [];
+  let testCount = 0;
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
+      console.log("getLabelLocs pixel loop iteration", testCount, "x:", x, "y:", y);
       if (!covered[y][x]) {
         let region = getRegion(mat, x, y, covered);
-        if (region.pixels.length > 100) {
+        coverRegion(covered, region);
+        if (region.x.length > 100) {
           // Threshold for size
-          let labelLoc = region.pixels[0]; // For simplicity, choose the first pixel
-          labelLocs.push({ ...labelLoc, value: region.value });
+          let labelLoc = {x: region.x[0] + 10, y: region.y[0] + 10, value: region.value}; // For simplicity, choose the 10th pixel (adds some padding)
+          labelLocs.push(labelLoc);
+          console.log("Successful location label:", labelLoc);
+        } else {
+          console.log("Too small, removing region.")
+          removeRegion(mat, region);
         }
+      } else {
+        console.log('The pixel is already covered.');
       }
+      testCount = testCount + 1;
     }
   }
-
+  console.log("Returning labelLocs:", labelLocs);
   return labelLocs;
 };
 
@@ -179,7 +240,6 @@ const ImageMatrixConverter = () => {
           console.log("Smoothed matrix:", smoothedMatrix);
 
           const outlinedMatrix = outline(smoothedMatrix);
-          console.log("Outlined matrix:", outlinedMatrix);
           setProcessedMatrix(outlinedMatrix);
 
           let covered = Array.from({ length: rawMatrix.length }, () =>
@@ -188,8 +248,10 @@ const ImageMatrixConverter = () => {
           let labelLocs = getLabelLocs(smoothedMatrix, covered);
 
           // Now you can use `labelLocs` for further processing or visualization
-          console.log(labelLocs);
+          console.log("Label locations:", labelLocs);
           setProcessedMatrix(outlinedMatrix);
+
+          console.log("Outlined matrix:", outlinedMatrix);
         };
         img.src = imgSrc;
       };
@@ -257,29 +319,29 @@ const ImageMatrixConverter = () => {
     return smoothedMat;
   };
 
-  const outline = (mat) => {
-    const height = mat.length;
-    const width = mat[0].length;
-    const outlinedMat = new Array(height)
-      .fill(null)
-      .map(() => new Array(width).fill(0));
+  // const outline = (mat) => {
+  //   const height = mat.length;
+  //   const width = mat[0].length;
+  //   const outlinedMat = new Array(height)
+  //     .fill(null)
+  //     .map(() => new Array(width).fill(0));
 
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        // Simple edge detection by comparing the pixel value to its neighbors
-        outlinedMat[y][x] = isEdge(mat, x, y) ? 255 : 0; // Edge marked with 255
-      }
-    }
-    return outlinedMat;
-  };
+  //   for (let y = 0; y < height; y++) {
+  //     for (let x = 0; x < width; x++) {
+  //       // Simple edge detection by comparing the pixel value to its neighbors
+  //       outlinedMat[y][x] = isEdge(mat, x, y) ? 255 : 0; // Edge marked with 255
+  //     }
+  //   }
+  //   return outlinedMat;
+  // };
 
-  const isEdge = (mat, x, y) => {
-    const val = mat[y][x];
-    const threshold = 15; // Define a threshold for edge detection
-    const neighbors = getNeighborhood(mat, x, y, 1);
+  // const isEdge = (mat, x, y) => {
+  //   const val = mat[y][x];
+  //   const threshold = 15; // Define a threshold for edge detection
+  //   const neighbors = getNeighborhood(mat, x, y, 1);
 
-    return neighbors.some((n) => Math.abs(n - val) > threshold);
-  };
+  //   return neighbors.some((n) => Math.abs(n - val) > threshold);
+  // };
 
   const displayProcessedMatrix = () => {
     const outputCanvas = canvasRef.current; // Using the same canvas to display the processed image
