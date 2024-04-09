@@ -194,10 +194,12 @@ app.get("/fetch-posts", async (req, res) => {
     let allPosts = [];
 
     // Iterate through each friend
-    for (let friendId of friendsArray) {
-      console.log("friendId:", friendId);
+    const friendIDs = friendsArray.map(friend => friend.userID);
+    for (friendID of friendIDs) {
+      console.log("friendId:", friendID);
       // Get the document for the friend
-      const friendDoc = await db.collection("Users").doc(friendId).get();
+      const friend = await db.collection("Users");
+      const friendDoc = await friend.doc(friendID).get();
 
       if (friendDoc.exists) {
         // Retrieve the posts array from the friend document
