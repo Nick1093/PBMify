@@ -358,6 +358,15 @@ const UserInterface = () => {
     }
     const imageData = matrixToImageData(matrix, colorPalette);
     displayImageData(imageData);
+    
+    const outlinePalette = [
+      { r: 0, g: 0, b: 0 }, // Black
+      { r: 255, g: 255, b: 255 } // White
+    ];
+    
+
+    const outlineData = matrixToImageData(outline(matrix), outlinePalette);
+    displayImageData(outlineData);
   };
 
 
