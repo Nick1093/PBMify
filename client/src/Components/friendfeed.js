@@ -36,8 +36,10 @@ const FriendFeedComponent = ({ currentUserID }) => {
 
     return (
         <div>
+            <h1>Your Friend's Posts</h1>
             <ul>
-                {friendPosts.map((post, index) => (
+
+                {friendPosts.length > 0 && friendPosts.map((post, index) => (
                     <li key={index}>
                         <div className="post-container">
                             {<img src={`data:image/jpeg;base64,${post.imageURL}`} alt="post" className="post" />}
