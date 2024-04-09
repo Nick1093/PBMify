@@ -26,6 +26,7 @@ const FriendFeedComponent = ({ currentUserID }) => {
                 console.error("Error fetching friend posts:", error);
             }
         };
+
         fetchFriendPosts();
     }, []);
 
@@ -35,10 +36,18 @@ const FriendFeedComponent = ({ currentUserID }) => {
         <div>
             <ul>
                 {friendPosts.map((post, index) => (
-                    <li key={index}>{post} {<img src={`data:image/jpeg;base64,${post.imageURL}`} alt="post" className="single-post" />}</li>
+                    <li key={index}>{post}</li>
                 ))}
             </ul>
         </div>
+    );
+    <div>
+        <ul>
+            {friendPosts.map((post, index) => (
+                <li key={index}>{post} {<img src={`data:image/jpeg;base64,${post.imageURL}`} alt="post" className="single-post" />}</li>
+            ))}
+        </ul>
+    </div>
     );
 };
 
