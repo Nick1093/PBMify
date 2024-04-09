@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useState } from "react";
 import { extractColors } from "extract-colors";
+import NavBar from "../Components/navbar";
 
 // Define the getNearest function that takes a color palette and a target color
 const getNearest = (palette, color) => {
@@ -319,6 +320,7 @@ const ImageMatrixConverter = () => {
 
   return (
     <>
+      <NavBar />
       <div
         onDrop={onDrop}
         onDragOver={onDragOver}
