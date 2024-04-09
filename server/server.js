@@ -179,9 +179,6 @@ app.get("/fetch-posts", async (req, res) => {
       res.status(201).send({ message: "User not found", userID: userID });
     }
 
-    // Assuming there's only one document with a given email (unique emails)
-    const userDoc = userSnapshot.docs[0];
-
     // Extract friends array from user document
     const friendsArray =
       docSnapshot.data().friends || docSnapshot.get("friends") || [];
