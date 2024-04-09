@@ -41,14 +41,15 @@ const FriendFeedComponent = ({ currentUserID }) => {
             <h1>Your Friend's Posts</h1>
             <Carousel useKeyboardArrows={true} className="post-container">
                 {friendPosts.length > 0 && friendPosts.map((post, index) => (
-                    <div key={index} >
+                    <div key={index}>
                         <p className="post-title">Title: {post.title}</p>
-                        {<img src={`data:image/jpeg;base64,${post.imageURL}`} alt="post" className="post" />}
+                        {<img src={`data:image/jpeg;base64,${post.rawImageURL}`} alt="post" className="post" />}
                         <div className="save-button">
-                            <a href={`data:image/jpeg;base64,${post.imageURL}`} download="image.png"  >
+                            <a href={`data:image/jpeg;base64,${post.rawImageURL}`} download="image.png"  >
                                 <button> <FontAwesomeIcon icon={faDownload} /> </button>
                             </a>
                         </div>
+                        {<img src={`data:image/jpeg;base64,${post.colorImageURL}`} alt="post" className="post" />}
                     </div>
                 )
                 )}

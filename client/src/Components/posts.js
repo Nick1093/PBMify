@@ -61,17 +61,18 @@ const Posts = ({ currentUserID }) => {
             <h1>My Posts</h1>
             <Carousel useKeyboardArrows={true} className="post-container">
                 {myPosts.length > 0 && myPosts.map((post, index) => (
-                    <div key={index} >
+                    <div key={index} className="image-container" >
                         <p className="post-title">Title: {post.title}</p>
-                        {<img src={`data:image/jpeg;base64,${post.imageURL}`} alt="post" className="post" />}
+                        {<img src={`data:image/jpeg;base64,${post.rawImageURL}`} alt="post" className="post" />}
                         <div className="button-container">
                             <button onClick={() => deletePost(post.postID)} className="remove-button">
                                 <FontAwesomeIcon icon={faTrash} />
                             </button>
-                            <a href={`data:image/jpeg;base64,${post.imageURL}`} download="image.png">
+                            <a href={`data:image/jpeg;base64,${post.rawImageURL}`} download="image.png">
                                 <button className="save-button"> <FontAwesomeIcon icon={faDownload} /> </button>
                             </a>
                         </div>
+                        {<img src={`data:image/jpeg;base64,${post.colorImageURL}`} alt="post" className="post" />}
                     </div>
                 ))}
             </Carousel>
