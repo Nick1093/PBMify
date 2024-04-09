@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom';
 import Settings from '../Components/Settings';
 import ViewFriends from '../Components/ViewFriends';
 import Posts from '../Components/posts';
-import '../styles/profile.css';
-
+import Footer from '../Components/footer';
 import "../styles/profile.css"
 import Navbar from '../Components/navbar';
 

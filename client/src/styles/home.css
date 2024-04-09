@@ -1,55 +1,75 @@
 /* Homepage Styles */
 
 .welcome-container {
-    background-color: #FFB703; /* Background color of the box */
-    padding: 80px; /* Padding around the text */
-    max-width: 100vw;    
-    margin: 0 auto; /* Center the container */
-  }
-  
-  /* Styles for the welcome text */
-  .welcome-text {
-    color: #023047; /* Text color */
-    font-size: 100px; /* Font size */
-    font-weight: bold; /* Font weight */
-    text-align: left; /* Left-align the text */
-  }
+  background-color: #FFB703;
+  /* Background color of the box */
+  padding: 80px;
+  /* Padding around the text */
+  max-width: 100vw;
+  margin: 0 auto;
+  /* Center the container */
+}
+
+/* Styles for the welcome text */
+.welcome-text {
+  color: #023047;
+  /* Text color */
+  font-size: 100px;
+  /* Font size */
+  font-weight: bold;
+  /* Font weight */
+  text-align: left;
+  /* Left-align the text */
+}
 
 .subtitle-text {
-    color: #fff; /* Text color */
-    font-size: 18px; /* Font size */
-    margin-top: 10px;
-    font-style: italic;
-    text-align: left;
+  color: #fff;
+  /* Text color */
+  font-size: 18px;
+  /* Font size */
+  margin-top: 10px;
+  font-style: italic;
+  text-align: left;
 }
 
 .about-container {
-    background-color: #219EbC; /* Background color of the box */
-    padding: 50px; /* Padding around the text */
-    max-width: 100vw;    
-    margin: 0 auto; 
-  }
-  
+  background-color: #219EbC;
+  /* Background color of the box */
+  padding: 50px;
+  /* Padding around the text */
+  max-width: 100vw;
+  margin: 0 auto;
+}
+
 .-- {
-    color: #fff; /* Text color */
-    font-size: 18px; /* Font size */
-    margin-top: 50px;
-    font-style: italic;
-    text-align: left;
+  color: #fff;
+  /* Text color */
+  font-size: 18px;
+  /* Font size */
+  margin-top: 50px;
+  font-style: italic;
+  text-align: left;
 }
 
 .about-text {
   flex: 1;
   color: #023047;
-  font-size: 90px; 
+  font-size: 90px;
   font-weight: bold;
   text-align: right;
 }
 
 .box {
   background-image: url('about.png');
-  background-size: contain; 
+  background-size: contain;
   background-repeat: no-repeat;
   max-width: 50%;
   height: auto;
+}
+
+.footer {
+  margin-top: 10%;
+  bottom: 0;
+  position: relative;
+  width: 100%;
 }

@@ -25,3 +25,10 @@
     background-color: darkgreen;
     color: white;
 }
+
+.footer {
+    margin-top: 10%;
+    bottom: 0;
+    position: relative;
+    width: 100%;
+}
