@@ -5,6 +5,7 @@ import NavBar from "../Components/navbar";
 import "../styles/UserInterface.css";
 // import _ from "lodash";
 import _ from "../Components/lodash.js";
+import { getRandomEquation } from "../Components/equations.js";
 
 // Define the getNearest function that takes a color palette and a target color
 const getNearest = (palette, color) => {
@@ -69,7 +70,6 @@ const neighborsSame = (mat, x, y) => {
 
 // Function to convert matrix back to ImageData
 const matrixToImageData = (mat, palette) => {
-  console.log("matrix to image data :", mat);
   const height = mat.length;
   const width = mat[0].length;
   const imageData = new ImageData(width, height);
@@ -78,7 +78,6 @@ const matrixToImageData = (mat, palette) => {
     for (let x = 0; x < width; x++) {
       const colorIndex = mat[y][x];
       const color = palette[colorIndex];
-      console.log(color);
       const dataIndex = (y * width + x) * 4;
 
       imageData.data[dataIndex] = color.red;
@@ -159,6 +158,7 @@ const UserInterface = () => {
   const [processedMatrix, setProcessedMatrix] = useState([]);
   const [colorPalette, setColorPalette] = useState([]);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [labelLocs, setLabelLocs] = useState([]);
 
   const processFile = async (file) => {
     if (file && file.type.startsWith("image/")) {
@@ -202,7 +202,7 @@ const UserInterface = () => {
           console.log("Smoothed matrix:", smoothedMatrix);
 
           let labelLocs = getLabelLocs(smoothedMatrix);
-          console.log("Label locations:", labelLocs);
+          setLabelLocs(labelLocs);
           // Send the smoothed matrix to the worker
           // workerRef.current.postMessage({ mat: smoothedMatrix });
 
@@ -334,6 +334,7 @@ const UserInterface = () => {
       return;
     }
     const imageData = matrixToImageData(matrix, colorPalette);
+    console.log(imageData);
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.putImageData(imageData, 0, 0);
@@ -380,20 +381,30 @@ const displayColorPalette = () => {
 
   const displayOutlinedImage = () => {
     const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
     if (!matrix.length) {
       console.error("Matrix or color palette is not set.");
       return;
     }
 
     const bw = [
-      { r: 255, g: 255, b: 255 },
-      { r: 0, g: 0, b: 0 },
+      { red: 255, green: 255, blue: 255 },
+      { red: 0, green: 0, blue: 0 },
     ];
 
     const outlinedData = matrixToImageData(processedMatrix, bw);
-    const ctx = canvas.getContext("2d");
+
+    // console.log(outlinedData);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.putImageData(outlinedData, 0, 0);
+
+    let gray = 128; // Example: mid-tone gray, adjust as needed
+
+    ctx.font = "12px Georgia";
+    ctx.fillStyle = `rgb(${gray}, ${gray}, ${gray})`; // Template literal for easier readability
+    labelLocs.forEach((labelLoc) => {
+      ctx.fillText(labelLoc.value + 1, labelLoc.x - 3, labelLoc.y + 4);
+    });
   };
 
   const removePhoto = () => {
