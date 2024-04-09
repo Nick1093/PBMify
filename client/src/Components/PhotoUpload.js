@@ -1,6 +1,8 @@
 import React, {useState} from "react";
 import Navbar from "./navbar";
 
+import "../styles/photoupload.css"
+
 const PhotoUpload = () => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [showMessage, setShowMessage] = useState(false);
@@ -36,11 +38,6 @@ const PhotoUpload = () => {
           <div
             onDragOver={dragOver}
             onDrop={drop}
-            style={{
-              border: "2px dashed #ccc",
-              padding: "20px",
-              marginTop: "20px",
-            }}
           >
             {selectedFile ? (
               <img
@@ -54,18 +51,6 @@ const PhotoUpload = () => {
           </div>
           {showMessage && (
             <div
-              style={{
-                position: "fixed",
-                top: "20px",
-                left: "50%",
-                transform: "translateX(-50%)",
-                background: "#87CEEB",
-                color: "#fff",
-                padding: "10px",
-                borderRadius: "5px",
-                boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
-                zIndex: 9999,
-              }}
             >
               Your photo is added!
             </div>

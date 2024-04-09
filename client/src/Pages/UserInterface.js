@@ -1,610 +1,412 @@
-import React, { useState, useEffect, useRef } from "react";
-import PhotoUpload from "../Components/PhotoUpload";
-import Navbar from "../Components/navbar";
-import getColourPalette from "../Components/ColorUtils";
 
-//import server from "../server/server";
-import "../styles/UserInterface.css"
+import React, { useRef, useEffect, useState } from "react";
+import { extractColors } from "extract-colors";
+import NavBar from "../Components/navbar";
+import cloneDeep from 'lodash/cloneDeep';
+import "../styles/UserInterface.css";
+import _ from 'lodash';
 
-const UserInterface = () => {
-<<<<<<< HEAD
-const [popupMessage, setPopupMessage] = useState('');
-const [imageData, setImageData] = useState(null);
-const [successMessage, setSuccessMsg] = useState('');
-const [paintByNumberImage, setPaintByNumberImage] = useState(null);
 
-useEffect(() => {
- if (imageData) {
-   generatePaintByNumberImage();
- }
-}, [imageData]);
 
-const generatePaintByNumberImage = async () => {
- try {
-  console.log("PBN Image running");
+// Define the getNearest function that takes a color palette and a target color
+const getNearest = (palette, color) => {
+  let nearestIndex = 0;
+  // Set an initial minimum distance to Infinity to ensure any first comparison is smaller
+  let minDistance = Infinity;
 
-  console.log("imageData:", imageData);
+  // Iterate over each color in the palette to find the nearest color to the given one
+  palette.forEach((pColor, index) => {
+    // Calculate the Euclidean distance between the current palette color and the given color
+    const distance = Math.sqrt(
+      (pColor.red - color.r) ** 2 + // Square difference in red component
+        (pColor.green - color.g) ** 2 + // Square difference in green component
+        (pColor.blue - color.b) ** 2 // Square difference in blue component
+    );
 
-   // Get color palette from the uploaded image
-   const palette = await getColourPalette(imageData);
-   console.log("palette:", palette);
+    // If this distance is smaller than the current minimum distance, update minDistance and nearestIndex
+    if (distance < minDistance) {
+      minDistance = distance; // Update the smallest found distance
+      nearestIndex = index; // Update the index of the nearest color
+      // console.log("New index for min distance: ", nearestIndex, minDistance);
+    }
+  });
 
-   // Limit palette to 20 colors
-   const limitedPalette = palette.slice(0, 20);
-
-   // Map colors to numbers
-   const colorMap = {};
-   limitedPalette.forEach((color, index) => {
-     colorMap[color] = index + 1; // Assigning numbers starting from 1
-   });
-
-   // Convert image to grid
-   const canvas = document.createElement("canvas");
-   const context = canvas.getContext("2d");
-   const img = new Image();
-   img.onload = function () {
-     canvas.width = img.width;
-     canvas.height = img.height;
-     context.drawImage(img, 0, 0, img.width, img.height);
-     const imageData = context.getImageData(0, 0, img.width, img.height)
-     const data = imageData.data;
-
-     for (let i = 0; i < data.length; i += 4) {
-       const red = data[i];
-       const green = data[i + 1];
-       const blue = data[i + 2];
-       const rgb = `rgb(${red},${green},${blue})`;
-       if (rgb in colorMap) {
-         const number = colorMap[rgb];
-         data[i] = number;
-         data[i + 1] = number;
-         data[i + 2] = number;
-     }
-   }
-
-   context.putImageData(imageData, 0, 0);
-     document.body.appendChild(canvas);
- };
-
- img.src = imageData;
-
- } catch (error) {
-   console.error("Error generating Paint by Number image:", error);
- }
+  // console.log("Final index: ", nearestIndex);
+  // Return the index of the nearest color in the palette
+  return nearestIndex;
 };
 
-function allowDrop(event) {
-  event.preventDefault();
+const getNeighborhood = (mat, x, y, range) => {
+  const values = [];
+  for (let i = -range; i <= range; i++) {
+    for (let j = -range; j <= range; j++) {
+      const nx = x + i;
+      const ny = y + j;
+      if (nx >= 0 && nx < mat[0].length && ny >= 0 && ny < mat.length) {
+        values.push(mat[ny][nx]);
+      }
+    }
+  }
+  return values;
+};
+
+// Function to convert matrix back to ImageData
+const matrixToImageData = (mat, palette) => {
+  const height = mat.length;
+  const width = mat[0].length;
+  const imageData = new ImageData(width, height);
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const colorIndex = mat[y][x];
+      const color = palette[colorIndex];
+      const dataIndex = (y * width + x) * 4;
+
+      imageData.data[dataIndex] = color.red;
+      imageData.data[dataIndex + 1] = color.green;
+      imageData.data[dataIndex + 2] = color.blue;
+      imageData.data[dataIndex + 3] = 255; // Full opacity
+    }
+  }
+
+  console.log("Matrix converted to image");
+
+  return imageData;
+};
+
+const getRegion = (mat, x, y, cov) => {
+  const covered = cloneDeep(cov);
+  const region = {value: mat[y][x], x: [], y: []};
+  const value = mat[y][x];
+
+  const queue = [[x, y]];
+
+  while (queue.length > 0) {
+    const [cx, cy] = queue.shift();
+
+    if (!covered[cy][cx] && mat[cy][cx] === value) {
+      region.x.push(cx);
+      region.y.push(cy);
+      covered[cy][cx] = true;
+
+      if (cx > 0) queue.push([cx - 1, cy]);
+      if (cx < mat[0].length - 1) queue.push([cx + 1, cy]);
+      if (cy > 0) queue.push([cx, cy - 1]);
+      if (cy < mat.length - 1) queue.push([cx, cy + 1]);
+    }
+  }
+  return region;
 }
 
+const getBelowValue = (mat, region) => {
+  let x = region.x[0];
+  let y = region.y[0];
+  while (mat[y][x] === region.value) {
+      y++;
+  }
+  return mat[y][x];
+}
 
-function drop(event) {
-  event.preventDefault();
-  const files = event.dataTransfer.files;
-  console.log(files)
-  console.log("files.length:",files.length)
+const removeRegion = (mat, region) => {
+  // console.log("REGION REMOVED:", region);
+  let newValue
+  if (region.y[0] > 0) {
+    newValue = mat[region.y[0] - 1][region.x[0]]; // assumes first pixel in list is topmost then leftmost of region.
+  } else {
+    newValue = getBelowValue(mat, region);
+  }
+  for (let i = 0; i < region.x.length; i++) {
+    mat[region.y[i]][region.x[i]] = newValue;
+  }
+}
 
-  if (files.length > 0) {
-    const file = files[0];
-    console.log("file:", file)
-
-    if (file.type.startsWith('image/')) {
-      const reader = new FileReader();
-
-      reader.onload = function (e) {
-        setPopupMessage('Your photo is added');
-        setImageData(e.target.result);
-      };
-
-      reader.readAsDataURL(file);
+const coverRegion = (covered, region) => {
+  for(let i = 0; i < region.x.length; i++) {
+    const x = region.x[i];
+    const y = region.y[i];
+    if(covered[y] !== undefined && covered[y][x] !== undefined) {
+      covered[y][x] = true;
     } else {
-      alert('Please drop an image file.');
+      console.error('covered[y] or covered[x] is undefined!!');
     }
   }
-}
+};
 
+const getLabelLocs = (mat) => {
+  console.log('Getting labellocs. This may take a while.');
+  let height = mat.length;
+  let width = mat[0].length;
+  let covered = Array(height).fill(null).map(() => _.fill(Array(width), false));  // using lodash fill
+  let labelLocs = [];
+  // let testCount = 0;
 
-
-function displaySelectedPhoto(event) {
- const file = event.target.files[0];
-
- if (file) {
-   const reader = new FileReader();
-
-   reader.onload = function (e) {
-     setPopupMessage('Your photo is added');
-     setImageData(e.target.result);
-   };
-
-   reader.readAsDataURL(file);
- }
-}
-
-
-/*function getNearest(palette, col) {
-  var nearest;
-  const nearestDistsq = 1000000;
-  for (const i = 0; i < palette.length; i++) {
-      const pcol = palette[i];
-      const distsq = Math.pow(pcol.r - col.r, 2) +
-    Math.pow(pcol.g - col.g, 2) +
-    Math.pow(pcol.b - col.b, 2);
-      if (distsq < nearestDistsq) {
-    nearest = i;
-    nearestDistsq = distsq;
-      }
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      // console.log("getLabelLocs pixel loop iteration", testCount, "x:", x, "y:", y);
+      if (!covered[y][x]) {
+        let region = getRegion(mat, x, y, covered);
+        coverRegion(covered, region);
+        if (region.x.length > 100) {
+          // Threshold for size
+          let labelLoc = {x: region.x[0] + 10, y: region.y[0] + 10, value: region.value}; // For simplicity, choose the 10th pixel (adds some padding)
+          labelLocs.push(labelLoc);
+          // console.log("Successful location label:", labelLoc);
+        } else {
+          // console.log("Too small, removing region.")
+          removeRegion(mat, region);
+        }
+      } 
+      // else {
+      //   console.log('The pixel is already covered.');
+      // }
+      // testCount = testCount + 1;
+    }
   }
-  return nearest;
-  };*/
-  
+  // console.log("Returning labelLocs:", labelLocs);
+  return labelLocs;
+};
 
-function removePhoto() {
- setImageData('');
- setPopupMessage('Your photo is removed');
- document.getElementById("photoInput").value = "";
-}
-=======
-  const [step, setStep] = useState("load");
-  const [view, setView] = useState("");
-  const [status, setStatus] = useState("");
-  const [palette, setPalette] = useState([]);
-  const [image, setImageSrc] = useState([]);
-  const [colorInfoVisible, setColorInfoVisible] = useState(false);
-  const [c, setC] = useState(null);
-  const [ctx, setCtx] = useState(null);
-  const [c2, setC2] = useState(null);
-  const [c3, setC3] = useState(null);
-  const imgCanvasRef = useRef(null);
-  const widthSliderRef = useRef(null);
-  const canvasesRef = useRef(null);
-  const [darknessSliderValue, setDarknessSliderValue] = useState(50);
-  const [loaderStyle, setLoaderStyle] = useState({
-    border: "4px dashed #777777"
-  });
+const UserInterface = () => {
+  const canvasRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const [matrix, setMatrix] = useState([]);
+  const [processedMatrix, setProcessedMatrix] = useState([]);
+  const [colorPalette, setColorPalette] = useState([]);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
-  const matToImageData = (mat, palette, context) => {
-    const imgData = context.createImageData(mat[0].length, mat.length);
-    for (let y = 0; y < mat.length; y++) {
-      for (let x = 0; x < mat[0].length; x++) {
-        const i = (y * mat[0].length + x) * 4;
-        const col = palette[mat[y][x]];
-        imgData.data[i] = col.r;
-        imgData.data[i + 1] = col.g;
-        imgData.data[i + 2] = col.b;
-        imgData.data[i + 3] = 255;
-      }
+  const processFile = async (file) => {
+    if (file && file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const imgSrc = e.target.result;
+        const img = new Image();
+        img.onload = async () => {
+          const canvas = canvasRef.current;
+          if (!canvas) {
+            console.error("Canvas not found");
+            return;
+          }
+
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0);
+          setImageLoaded(true);
+
+          const options = {
+            pixels: 64000,
+            distance: 0.11,
+            saturationDistance: 0.2,
+            lightnessDistance: 0.2,
+            hueDistance: 0.083333333,
+          };
+
+          const colors = await extractColors(imgSrc, options);
+          setColorPalette(colors);
+          console.log("Color palette:", colors);
+
+          // Make sure the palette is loaded before processing the image
+
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          console.log("Image data:", imageData);
+
+          const rawMatrix = imageDataToSimpMat(imageData, colors); // Pass the loaded color palette
+          setMatrix(rawMatrix);
+          console.log("Raw matrix:", rawMatrix);
+
+          const smoothedMatrix = smooth(rawMatrix);
+          console.log("Smoothed matrix:", smoothedMatrix);
+
+          const outlinedMatrix = outline(smoothedMatrix);
+          console.log("Outlined matrix:", outlinedMatrix);
+          setProcessedMatrix(outlinedMatrix);
+
+          let covered = Array.from({ length: rawMatrix.length }, () =>
+            Array(rawMatrix[0].length).fill(false)
+          );
+          let labelLocs = getLabelLocs(smoothedMatrix, covered);
+
+          // Now you can use `labelLocs` for further processing or visualization
+          console.log("labelLocs:", labelLocs);
+          setProcessedMatrix(outlinedMatrix);
+        };
+        img.src = imgSrc;
+      };
+      reader.readAsDataURL(file);
     }
-    return imgData;
-  };
-  
-  const DisplayResults = ({ matSmooth, matLine, labelLocs, palette }) => {
-    const filledCanvasRef = useRef(null);
-    const outlineCanvasRef = useRef(null);
-  
-    const drawFilled = () => {
-      const filledCanvas = filledCanvasRef.current;
-      const ctx = filledCanvas.getContext("2d");
-      const imgData = matToImageData(matSmooth, palette, ctx);
-      ctx.putImageData(imgData, 0, 0);
-    };
-  
-    const drawOutlines = () => {
-  const outlineCanvas = outlineCanvasRef.current;
-  const gray = Math.round(255 * (1 - darknessSliderValue / 100));
-  const bw = [{ r: 255, g: 255, b: 255 }, { r: gray, g: gray, b: gray }];
-  const ctx = outlineCanvas.getContext("2d");
-  const imgData = matToImageData(matLine, bw, ctx);
-  ctx.putImageData(imgData, 0, 0);
-  
-  ctx.font = "12px Georgia";
-  ctx.fillStyle = `rgb(${gray}, ${gray}, ${gray})`;
-  labelLocs.forEach((label) => {
-    ctx.fillText(label.value + 1, label.x - 3, label.y + 4);
-  });
-  
-  
-    return (
-      <div>
-        <canvas id="filled-canvas" ref={filledCanvasRef}></canvas>
-        <canvas id="outline-canvas" ref={outlineCanvasRef}></canvas>
-      </div>
-    );
-  };
->>>>>>> b6309cc3eaf66ea2c69ac71c8c21a811b6614dd6
-
-  const handleImageUpload = (file) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setImageSrc(e.target.result);
-    };
-    reader.readAsDataURL(file);
   };
 
-  const imageLoaded = (imgSrc) => {
-    const img = new Image();
-    img.src = imgSrc;
-    img.onload = () => {
-      const c = imgCanvasRef.current;
-      const scale = c.width / img.naturalWidth;
-      c.height = img.naturalHeight * scale;
-      if (canvasesRef.current) {
-        canvasesRef.current.style.height = (c.height + 20) + "px";
-      }
-      const ctx = c.getContext("2d");
-      ctx.drawImage(img, 0, 0, c.width, c.height);
-      setStep("select");
-    };
+  const onDrop = (event) => {
+    event.preventDefault();
+    const file = event.dataTransfer.files[0];
+    processFile(file);
   };
 
-  const addColor = (color) => {
-    setPalette([...palette, color]);
+  const onDragOver = (event) => {
+    event.preventDefault();
   };
 
-  const removeColor = (color) => {
-    setPalette(palette.filter((c) => c !== color));
+  const onClick = () => {
+    fileInputRef.current.click(); // Simulate click on the file input when the drop zone is clicked
   };
 
-  const getNearest = (palette, col) => {
-    let nearest;
-    let nearestDistsq = 1000000;
-    for (let i = 0; i < palette.length; i++) {
-      const pcol = palette[i];
-      const distsq =
-        Math.pow(pcol.r - col.r, 2) +
-        Math.pow(pcol.g - col.g, 2) +
-        Math.pow(pcol.b - col.b, 2);
-      if (distsq < nearestDistsq) {
-        nearest = i;
-        nearestDistsq = distsq;
-      }
-    }
-    return nearest;
+  const onFileChange = (event) => {
+    const file = event.target.files[0];
+    processFile(file);
   };
-  
+
   const imageDataToSimpMat = (imgData, palette) => {
+    const width = imgData.width;
+    const height = imgData.height;
     const mat = [];
-    for (let i = 0; i < imgData.height; i++) {
-      mat[i] = new Array(imgData.width);
+
+    for (let y = 0; y < height; y++) {
+      const row = [];
+      for (let x = 0; x < width; x++) {
+        const index = (y * width + x) * 4;
+        const color = {
+          r: imgData.data[index],
+          g: imgData.data[index + 1],
+          b: imgData.data[index + 2],
+        };
+        const nearestIndex = getNearest(palette, color);
+        row.push(nearestIndex);
+      }
+      mat.push(row);
     }
-    for (let i = 0; i < imgData.data.length; i += 4) {
-      const nearestI = getNearest(palette, {
-        r: imgData.data[i],
-        g: imgData.data[i + 1],
-        b: imgData.data[i + 2]
-      });
-      const x = (i / 4) % imgData.width;
-      const y = Math.floor(i / 4 / imgData.width);
-      mat[y][x] = nearestI;
-    }
+
     return mat;
   };
-  
-  const rgbToHex = (r, g, b) => {
-    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-  };
-  
-  const rgbToCmyk = (r, g, b) => {
-    const k = 1 - Math.max(r / 255, g / 255, b / 255);
-    let c, m, y;
-    if (k === 1) {
-      c = 0;
-      m = 0;
-      y = 0;
-    } else {
-      c = (1 - r / 255 - k) / (1 - k);
-      m = (1 - g / 255 - k) / (1 - k);
-      y = (1 - b / 255 - k) / (1 - k);
-    }
-  
-    return {
-      c: Math.round(c * 100),
-      m: Math.round(m * 100),
-      y: Math.round(y * 100),
-      k: Math.round(k * 100)
-    };
-  };
 
-  const rgbToHsl = (r, g, b) => {
-    r = r / 255;
-    g = g / 255;
-    b = b / 255;
-    
-    const M = Math.max(r, g, b);
-    const m = Math.min(r, g, b);
-    
-    let h;
-    if (M === m) {
-      h = 0;
-    } else if (M === r) {
-      h = 60 * (g - b) / (M - m);
-    } else if (M === g) {
-      h = 60 * (b - r) / (M - m) + 120;
-    } else {
-      h = 60 * (r - g) / (M - m) + 240;
-    }
-    
-    const l = (M + m) / 2;
-    let s;
-    if (l === 0 || l === 1) {
-      s = 0;	// So it isn't NaN for black or white.
-    } else {
-      s = (M - m) / (1 - Math.abs(2 * l - 1));
-    }
-    
-    return {
-      h: ((Math.round(h) % 360) + 360) % 360,  // js modulo isn't always positive
-      s: Math.round(s * 100),
-      l: Math.round(l * 100)
-    };
-  };
-  
-  const rgbToHsv = (r, g, b) => {
-    r = r / 255;
-    g = g / 255;
-    b = b / 255;
-    
-    const M = Math.max(r, g, b);
-    const m = Math.min(r, g, b);
-    
-    let h;
-    if (M === m) {
-      h = 0;
-    } else if (M === r) {
-      h = 60 * (g - b) / (M - m);
-    } else if (M === g) {
-      h = 60 * (b - r) / (M - m) + 120;
-    } else {
-      h = 60 * (r - g) / (M - m) + 240;
-    }
-  
-    let s;
-    if (M === 0) {
-      s = 0;	// So it isn't NaN for black.
-    } else {
-      s = (M - m) / M;
-    }
-    
-    return {
-      h: ((Math.round(h) % 360) + 360) % 360,
-      s: Math.round(s * 100),
-      v: Math.round(M * 100)
-    };
-  };
-  
-  const getColorInfo = (palette) => {
-    for (let i = 0; i < palette.length; i++) {
-      const col = palette[i];
-      col.hex = rgbToHex(col.r, col.g, col.b);
-      col.cmyk = rgbToCmyk(col.r, col.g, col.b);
-      col.hsl = rgbToHsl(col.r, col.g, col.b);
-      col.hsv = rgbToHsv(col.r, col.g, col.b);
-    }
-  };
-  
-  const pbnify = () => {
-    setStep("process");
-    const width = c.width;
-    const height = c.height;
-    const imgData = ctx.getImageData(0, 0, width, height);
-    const mat = imageDataToSimpMat(imgData, palette);
-  
-    const worker = new Worker('scripts/processImage.js');
-    worker.addEventListener('message', (e) => {
-      if (e.data.cmd === "status") {
-        setStatus(e.data.status);
-      } else {
-        const matSmooth = e.data.matSmooth;
-        const labelLocs = e.data.labelLocs;
-        const matLine = e.data.matLine;
-        worker.terminate();
-  
-        DisplayResults(matSmooth, matLine, labelLocs);
-        getColorInfo(palette);  // adds hex and CMYK values for display
-        setStep("result");
-        setView("filled");
+  const smooth = (mat) => {
+    const height = mat.length;
+    const width = mat[0].length;
+    const smoothedMat = new Array(height)
+      .fill(null)
+      .map(() => new Array(width).fill(0));
+
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        // Get the average of the surrounding pixels
+        const values = getNeighborhood(mat, x, y, 1); // Using 1 for immediate neighborhood
+        const avg = values.reduce((sum, val) => sum + val, 0) / values.length;
+        smoothedMat[y][x] = avg;
       }
-    }, false);
-    worker.postMessage({ mat: mat });
-  };
-
-  
-  const newImage = () => {
-    setPalette([]);
-    if (canvasesRef.current) {
-      canvasesRef.current.style.height = "0px";
     }
-    setStep("load");
+    return smoothedMat;
   };
+
+  const neighborsSame = (mat, x, y) => {
+    let height = mat.length;
+    let width = mat[0].length;
+    let val = mat[y][x];
+    let xRel = [1, 0];
+    let yRel = [0, 1];
   
-
-  const recolor = () => {
-    setStep("select");
-  };
-
-  const clearPalette = () => {
-    setPalette([]);
-  };
-
-  const showColorInfo = () => {
-    setColorInfoVisible(true);
-  };
-
-  const hideColorInfo = () => {
-    setColorInfoVisible(false);
-  };
-
-  const viewFilled = () => {
-    setView("filled");
-  };
-
-  const viewOutline = () => {
-    setView("outline");
-  };
-
-  const saveFilled = () => {
-    const win = window.open();
-    win.document.write('<html><head><title>PBN filled</title></head><body><img src="' + c2.toDataURL() + '"></body></html>');
-    // win.print();
-  };
-
-  const saveOutline = () => {
-    const win = window.open();
-    win.document.write('<html><head><title>PBN outline</title></head><body><img src="' + c3.toDataURL() + '"></body></html>');
-    // win.print();
-  };
-
-  const savePalette = () => {
-    const canvas = document.createElement('canvas');
-    canvas.width = 80 * Math.min(palette.length, 10);
-    canvas.height = 80 * (Math.floor((palette.length - 1) / 10) + 1);
-    const ctx = canvas.getContext("2d");
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = "#000000";
-    for (let i = 0; i < palette.length; i++) {
-      const col = palette[i];
-      ctx.fillStyle = "rgba(" + col.r + ", " + col.g + ", " + col.b + ", 255)";
-      const x = 80 * (i % 10);
-      const y = 80 * Math.floor(i / 10);
-      ctx.fillRect(x + 10, y + 10, 60, 60);
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(x + 10, y + 10, 20, 20);
-      ctx.font = '16px sans-serif';
-      ctx.fillStyle = "#000000";
-      ctx.textAlign = "center";
-      ctx.fillText(i + 1, x + 20, y + 26);
-      ctx.strokeRect(x + 10, y + 10, 60, 60);
+    for (let i = 0; i < xRel.length; i++) {
+      let xx = x + xRel[i];
+      let yy = y + yRel[i];
+      if (xx >= 0 && xx < width && yy >= 0 && yy < height) {
+        if (mat[yy][xx] !== val) {
+          return false;
+        }
+      }
     }
+    return true;
+  }
+  
+  const outline = (mat) => {
+    let height = mat.length;
+    let width = mat[0].length;
+    let line = Array.from({ length: height }, () => new Array(width).fill(0));
+  
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        line[y][x] = neighborsSame(mat, x, y) ? 0 : 1;
+      }
+    }
+  
+    return line;
+    
+  }
 
-    const win = window.open();
-    win.document.write('<html><head><title>PBN palette</title></head><body><img src="' + canvas.toDataURL() + '"></body></html>');
-    // win.print();
+  const displayProcessedMatrix = () => {
+    const outputCanvas = canvasRef.current; // Using the same canvas to display the processed image
+    if (outputCanvas && processedMatrix.length > 0 && colorPalette.length > 0) {
+      const ctx = outputCanvas.getContext("2d");
+      ctx.clearRect(0, 0, outputCanvas.width, outputCanvas.height); // Clear the canvas before drawing new image
+      const imageData = matrixToImageData(processedMatrix, colorPalette);
+      ctx.putImageData(imageData, 0, 0);
+    }
   };
-}
 
-<<<<<<< HEAD
- const saveImage = async () => {
+  const displayImageData = (imageData) => {
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      console.error("Canvas not found");
+      return;
+    }
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.putImageData(imageData, 0, 0);
+  };
 
-   const getUserId = (req) => {
-     return req.session.userId;
-   }
-
-   const getImage = (req) => {
-     return req.session.image;
-   }
-
-   const getTitle = (req) => {
-     return req.session.title;
-   }
-
-   try {
-     const userId = getUserId();
-     const image = getImage();
-     const title = getTitle();
-
-     const formData = new FormData();
-     formData.append('userId', userId);
-     formData.append('image', image);
-     formData.append('title', title);
-
-     const response = await fetch("http://localhost:8001/create-post", {
-       method: "POST",
-       body: formData,
-     });
-
-     if (!response.ok) {
-       throw new Error("Failed to save image. Please try again.");
-     }
-
-     const successMessage = await response.json();
-     if (successMessage.message === "Post added successfully") {
-       setSuccessMsg("Image saved successfully to user's profile.");
-     } else {
-       throw new Error("Failed to save image. Please try again.");
-     }
-   } catch (error) {
-     console.error("Error saving image:", error.message);
-     setSuccessMsg("Failed to save image. Please try again.");
-   }
- };
+  const processMatrix = () => {
+    if (!matrix.length || !colorPalette.length) {
+      console.error("Matrix or color palette is not set.");
+      return;
+    }
+    const imageData = matrixToImageData(matrix, colorPalette);
+    displayImageData(imageData);
+  };
 
 
-return (
-  <div className="container">
+
+  return (
+    <>
+
+      <NavBar />
+
       <div
-          id="dropZone"
-          onDragOver={allowDrop}
-          onDrop={drop}
-          style={{
-              width: '600px',
-              height: '400px',
-              border: '2px dashed #aaa',
-              textAlign: 'center',
-              lineHeight: '380px',
-              margin: '20px auto',
-          }}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
+        onClick={onClick}
+        style={{
+          width: "100%",
+          height: "500px",
+          border: "1px solid black",
+          cursor: "pointer",
+          position: "relative",
+        }}
       >
-          {imageData ? (
-              <img
-                 src={imageData}
-                 alt="Drag and Drop You Photo"
-                 style={{ maxWidth: '90%', maxHeight: '90%' }}
-              />
-          ) : (
-              <>
-                  <h1 style={{ color: 'lightgray' }}>
-                      {/* <link rel="preconnect" href="https://fonts.googleapis.com">
-                      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> */}
-                      {/* <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Tilt+Warp&display=swap" rel="stylesheet"> */}
-                      Drag and Drop Your Photo
-                      {/* </link>
-                      </link>
-                      </link> */}
-                  </h1>
-              </>
-          )}
-      </div>
-      <label htmlFor="photoInput" id="addPhotoBtn">
-          {/* <link rel="preconnect" href="https://fonts.googleapis.com">
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-          <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Tilt+Warp&display=swap" rel="stylesheet">
-              Add Photo
-          </link>
-          </link>
-          </link> */}
-          Add Photo
-      </label>
-      <input
+        Drop or click to upload an image
+        <input
           type="file"
-          id="photoInput"
+          ref={fileInputRef}
+          onChange={onFileChange}
+          style={{ display: "none" }}
           accept="image/*"
-          onChange={displaySelectedPhoto}
-          style={{ display: 'none' }}
-      />
-      <button id="removePhotoBtn" onClick={removePhoto}>
-          {/* <link rel="preconnect" href="https://fonts.googleapis.com">
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-          <link href="https://fonts.googleapis.com/css2?family=Climate+Crisis&family=Tilt+Warp&display=swap" rel="stylesheet">
-              Remove Photo
-          </link>
-          </link>
-          </link> */}
-          Remove Photo
-      </button>
-      {popupMessage && <div className="popup">{popupMessage}</div>}
-      {/* <button onClick={saveImage}>Save Image</button> */}
-      {successMessage && <div className="saveSuccess">{successMessage}</div>}
-      {imageData && (
-          <div>
-             
-          </div>
-      )}
-  </div>
-);
-=======
->>>>>>> b6309cc3eaf66ea2c69ac71c8c21a811b6614dd6
+        />
+        <canvas
+          ref={canvasRef}
+          style={{
+            display: imageLoaded ? "block" : "none",
+            maxWidth: "100%",
+            maxHeight: "500px",
+          }}
+        />
 
+        
 
-}
+      </div>
+
+      <div>
+        <button id="Matrix to image" onClick={() => processMatrix()}>Proceed Matrix</button>
+      </div>
+      {/* Additional UI components to display matrix and color palette */}
+    </>
+  );
+};
 
 export default UserInterface;
+

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { UserAuth } from "../Context/AuthContext";
+import '../styles/viewFriends.css';
 
 const ViewFriends = () => {
     const [friends, setFriends] = useState([]);
@@ -20,13 +21,13 @@ const ViewFriends = () => {
         getFriends();
     }, []);
 
-    const searchFriends = friends.filter(friend => friend.email.toLowerCase().includes(search.toLowerCase()));
+    const searchFriends = friends.filter(friend => friend.email && friend.email.toLowerCase().includes(search.toLowerCase()));
 
     return (
         <div>
             <h1>View Friends</h1>
             <h2>Friends</h2>
-            <input type="text" placeholder="Search Your Friends" value={search} onChange={(e) => setSearch(e.target.value)} />
+            <input type="text" className="search-bar" placeholder="Search Your Friends" value={search} onChange={(e) => setSearch(e.target.value)} />
             <ul>
                 {searchFriends.map((friend) => {
                     return <li key={friend.userID}>{friend.email}</li>

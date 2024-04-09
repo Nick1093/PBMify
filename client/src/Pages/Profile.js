@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom';
 import Settings from '../Components/Settings';
 import ViewFriends from '../Components/ViewFriends';
 import Posts from '../Components/posts';
+import '../styles/profile.css';
 
-
+import "../styles/profile.css"
+import Navbar from '../Components/navbar';
 
 const Profile = () => {
     const [activeComponent, setActiveComponent] = useState();
@@ -24,15 +26,12 @@ const Profile = () => {
 
     return (
         <div>
-            <h1>Profile Page</h1>
-            <nav className="profile-navbar">
-                <ul>
-                    <li onClick={() => setActiveComponent('posts')}>Profile</li>
-                    <li onClick={() => setActiveComponent('settings')}>Settings</li>
-                    <li onClick={() => setActiveComponent('viewFriends')}>View Friends</li>
-                    <li>
-                        <Link to="/">Home </Link>{" "}
-                    </li>
+            <Navbar></Navbar>
+            <nav className="profile-nav">
+                <ul className="profile-list">
+                    <li onClick={() => setActiveComponent('posts')} className="posts" >My Posts</li>
+                    <li onClick={() => setActiveComponent('settings')} >Settings</li>
+                    <li onClick={() => setActiveComponent('viewFriends')} >View Friends</li>
                 </ul>
             </nav>
             {renderComponent()}

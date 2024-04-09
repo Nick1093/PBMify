@@ -1,0 +1,41 @@
+.post-container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  max-width: 300px;
+  /* adjust as needed */
+  margin: 10px;
+  /* adjust as needed */
+}
+
+.post {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.save-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.save-button button {
+  font-size: 3em;
+}
+
+
+.post-container:hover .save-button {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.2);
+}
+
+.feed-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}

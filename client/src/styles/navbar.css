@@ -1,0 +1,72 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.logo {
+    height: 15px;
+    background-image: url('PBMify.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.navBar-nav {
+    background-color: #023047;
+    padding: 10px;
+    list-style-type: none;
+    text-align: center;
+}
+
+.navBar-nav li {
+    display: inline-block;
+}
+
+.navBar-nax ul {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    list-style-type: none;
+    padding: 0;
+}
+
+.navBar-nav li a {
+    color: #8ECAE6;
+    font-family: "Poppins", sans-serif;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+/* Change link color on hover */
+.navBar-nav li a:hover {
+    background-color: #1a2c40;
+    color: white;
+    /* Darker background color on hover */
+}
+
+.navBar-nav li.userPfp {
+    color: white;
+    /* Make the .userPfp white */
+    /* Other styles for the .userPfp */
+}
+
+.navBar-nav li.userPfp .dropdown-menu {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+    top: 180px;
+    transform: translateX(-45%);
+    border-radius: 10px;
+    background-color: #D3D3D3;
+    /* Other styles for the dropdown menu */
+}
+
+.navBar-nav li.userPfp ul li {
+    margin: 10px 0;
+    color: black;
+    /* Add vertical space between the list items */
+    /* Other styles for the list items */
+}
