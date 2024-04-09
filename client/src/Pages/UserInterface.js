@@ -5,6 +5,7 @@ import NavBar from "../Components/navbar";
 import "../styles/UserInterface.css";
 // import _ from "lodash";
 import _ from "../Components/lodash.js";
+import { getRandomEquation } from "../Components/equations.js";
 
 // Define the getNearest function that takes a color palette and a target color
 const getNearest = (palette, color) => {
