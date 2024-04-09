@@ -3,6 +3,8 @@ const express = require("express");
 const app = express();
 const port = 8001;
 const bodyParser = require("body-parser");
+const cors = require('cors');
+
 const {
   initializeApp,
   applicationDefault,
