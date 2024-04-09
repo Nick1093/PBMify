@@ -29,8 +29,9 @@
 }
 
 .post {
-  max-width: 100%;
+  width: 400px;
   height: auto;
+  padding: 50px;
 }
 
 
@@ -52,6 +53,11 @@
 
 .control-arrow {
   display: none;
+}
+
+.post-container {
+  position: relative;
+  width: 1000px;
 }
 
 /* Style for the next arrow */
