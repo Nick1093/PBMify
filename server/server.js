@@ -151,7 +151,7 @@ app.get("/my-posts", async (req, res) => {
   }
 });
 
-//>>>>>>> a7b3b45c0e1ab519429d98290a87b0e2e6024a7c
+
 app.get("/fetch-posts", async (req, res) => {
   // get friends posts
   //get UserID
