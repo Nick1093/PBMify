@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { UserAuth } from "../Context/AuthContext";
-import "../styles/friendfeedpage.css"
+import "../styles/friendfeedpage.css";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faDownload } from '@fortawesome/free-solid-svg-icons';
 
 const FriendFeedComponent = ({ currentUserID }) => {
     const { user } = UserAuth();
@@ -36,18 +38,19 @@ const FriendFeedComponent = ({ currentUserID }) => {
         <div>
             <ul>
                 {friendPosts.map((post, index) => (
-                    <li key={index}>{post}</li>
+                    <li key={index}>
+                        <div className="post-container">
+                            {<img src={`data:image/jpeg;base64,${post.imageURL}`} alt="post" className="post" />}
+                            <div className="save-button">
+                                <a href={`data:image/jpeg;base64,${post.imageURL}`} download="image.png"  >
+                                    <button> <FontAwesomeIcon icon={faDownload} /> </button>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
                 ))}
             </ul>
         </div>
-    );
-    <div>
-        <ul>
-            {friendPosts.map((post, index) => (
-                <li key={index}>{post} {<img src={`data:image/jpeg;base64,${post.imageURL}`} alt="post" className="single-post" />}</li>
-            ))}
-        </ul>
-    </div>
     );
 };
 

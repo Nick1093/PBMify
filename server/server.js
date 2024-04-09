@@ -166,7 +166,8 @@ app.get("/fetch-posts", async (req, res) => {
   console.log("---------------------------");
 
   //Reference the 'Users' collection
-  const userDoc = db.collection("Users").doc(userID);
+  const usersRef = db.collection("Users");
+  const userDoc = usersRef.doc(userID);
 
   //This is the snapshot
   const docSnapshot = await userDoc.get();
@@ -188,30 +189,34 @@ app.get("/fetch-posts", async (req, res) => {
     // Extract friends array from user document
     const friendsArray =
       docSnapshot.data().friends || docSnapshot.get("friends") || [];
-    console.log("YEEEEEHAW");
+    // console.log("YEEEEEHAW");
+    // console.log("Friends Array: ", friendsArray);
 
     //array to store friends
     let allPosts = [];
 
     // Iterate through each friend
-    const friendIDs = friendsArray.map(friend => friend.userID);
-    for (friendID of friendIDs) {
+    // const friendIDs = friendsArray.map(friend => friend.userID);
+
+    for (friendID of friendsArray) {
       console.log("friendId:", friendID);
       // Get the document for the friend
-      const friend = await db.collection("Users");
-      const friendDoc = await friend.doc(friendID).get();
+      const friendDoc = await usersRef.doc(friendID).get();
 
       if (friendDoc.exists) {
         // Retrieve the posts array from the friend document
-        const friendPosts = (await friendDoc.data().posts) || [];
+        const friendPosts = await friendDoc.data().posts;
+        console.log("Friend Posts: ", friendPosts);
 
-        // Add the friend's posts to the allPosts array
         allPosts = allPosts.concat(friendPosts);
+        console.log("New All Posts: ", allPosts);
       } else {
         // if not work
         console.log(`Friend document for user ${friendId} does not exist`);
       }
     }
+
+    console.log("All Posts: ", allPosts);
     res.status(201).send(allPosts);
   } catch (error) {
     console.error("Error adding post to user:", error);
