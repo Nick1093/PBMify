@@ -3,7 +3,7 @@ import { UserAuth } from "../Context/AuthContext";
 import Navbar from '../Components/navbar';
 import "../styles/community.css"
 import FriendFeedComponent from '../Components/friendfeed';
-
+import Footer from '../Components/footer';
 const Community = () => {
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
@@ -59,6 +59,7 @@ const Community = () => {
             {message && !message.includes("Error") && <p style={{ color: 'green' }}>{message}</p>}
             <h1>Friend Feed</h1>
             <FriendFeedComponent /> {/* Pass currentUserID prop */}
+            <Footer className="footer" />
         </div>
     );
 }
