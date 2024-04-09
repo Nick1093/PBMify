@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { UserAuth } from "../Context/AuthContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import '../styles/posts.css';
 
 
@@ -59,10 +60,17 @@ const Posts = ({ currentUserID }) => {
             <ul className="my-posts">
                 {myPosts.map((post, index) => (
                     <li key={index}>
-                        {<img src={`data:image/jpeg;base64,${post.imageURL}`} alt="post" className="single-post" />}
-                        <button onClick={() => deletePost(post.postID)} className="remove-post-icon">
-                            <FontAwesomeIcon icon={faTrash} />
-                        </button>
+                        <div className="post-container">
+                            {<img src={`data:image/jpeg;base64,${post.imageURL}`} alt="post" className="post" />}
+                            <div className="button-container">
+                                <button onClick={() => deletePost(post.postID)} className="remove-button">
+                                    <FontAwesomeIcon icon={faTrash} />
+                                </button>
+                                <a href={`data:image/jpeg;base64,${post.imageURL}`} download="image.png">
+                                    <button className="save-button"> <FontAwesomeIcon icon={faDownload} /> </button>
+                                </a>
+                            </div>
+                        </div>
                     </li>
                 ))}
             </ul>

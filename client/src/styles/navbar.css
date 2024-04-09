@@ -52,14 +52,13 @@
     /* Other styles for the .userPfp */
 }
 
-.navBar-nav li.userPfp ul {
+.navBar-nav li.userPfp .dropdown-menu {
     position: absolute;
     display: flex;
     flex-direction: column;
     width: 200px;
-    left: 50%;
-    transform: translateX(-50%);
-    top: 30px;
+    top: 180px;
+    transform: translateX(-45%);
     border-radius: 10px;
     background-color: #D3D3D3;
     /* Other styles for the dropdown menu */
