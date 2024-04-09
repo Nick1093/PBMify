@@ -62,6 +62,8 @@ const matrixToImageData = (mat, palette) => {
     }
   }
 
+  console.log("Matrix converted to image")
+
   return imageData;
 };
 
@@ -291,6 +293,8 @@ const ImageMatrixConverter = () => {
     }
   };
 
+
+
   return (
     <>
       <div
@@ -321,6 +325,13 @@ const ImageMatrixConverter = () => {
             maxHeight: "500px",
           }}
         />
+
+        
+
+      </div>
+
+      <div>
+        <button id="Matrix to image" onClick={displayProcessedMatrix}>Processe Matrix</button>
       </div>
       {/* Additional UI components to display matrix and color palette */}
     </>
