@@ -9,7 +9,7 @@ const FriendFeedPage = ({ currentUserID }) => {
   return (
     <div>
       <NavBar />
-      <h2>Friend Feed</h2>
+      <h1>Friend Feed</h1>
       <FriendFeedComponent /> {/* Pass currentUserID prop */}
     </div>
   );
