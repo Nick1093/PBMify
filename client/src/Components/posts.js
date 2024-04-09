@@ -4,6 +4,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import '../styles/posts.css';
+import { Carousel } from 'react-responsive-carousel';
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 
 const Posts = ({ currentUserID }) => {
@@ -57,23 +59,22 @@ const Posts = ({ currentUserID }) => {
     return (
         <div>
             <h1>My Posts</h1>
-            <ul className="my-posts">
-                {myPosts.map((post, index) => (
-                    <li key={index}>
-                        <div className="post-container">
-                            {<img src={`data:image/jpeg;base64,${post.imageURL}`} alt="post" className="post" />}
-                            <div className="button-container">
-                                <button onClick={() => deletePost(post.postID)} className="remove-button">
-                                    <FontAwesomeIcon icon={faTrash} />
-                                </button>
-                                <a href={`data:image/jpeg;base64,${post.imageURL}`} download="image.png">
-                                    <button className="save-button"> <FontAwesomeIcon icon={faDownload} /> </button>
-                                </a>
-                            </div>
+            <Carousel useKeyboardArrows={true} className="post-container">
+                {myPosts.length > 0 && myPosts.map((post, index) => (
+                    <div key={index} >
+                        <p className="post-title">Title: {post.title}</p>
+                        {<img src={`data:image/jpeg;base64,${post.imageURL}`} alt="post" className="post" />}
+                        <div className="button-container">
+                            <button onClick={() => deletePost(post.postID)} className="remove-button">
+                                <FontAwesomeIcon icon={faTrash} />
+                            </button>
+                            <a href={`data:image/jpeg;base64,${post.imageURL}`} download="image.png">
+                                <button className="save-button"> <FontAwesomeIcon icon={faDownload} /> </button>
+                            </a>
                         </div>
-                    </li>
+                    </div>
                 ))}
-            </ul>
+            </Carousel>
         </div>
     );
 };
