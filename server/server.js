@@ -128,11 +128,15 @@ app.post("/create-post", async (req, res) => {
 });
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 //<<<<<<< HEAD
 //=======
 =======
 
 >>>>>>> bfee62a44e6db3e4e21be97e944ed809b066273d
+=======
+
+>>>>>>> 05223b484f0309d259d28ff3c39ca6659c84d176
 app.get("/my-posts", async (req, res) => {
   // Get the user ID from the query string
   const { userId } = req.query;

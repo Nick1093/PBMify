@@ -317,9 +317,11 @@ const ImageMatrixConverter = () => {
 
 
   return (
+
     
     <>
     <NavBar />
+
       <div
         onDrop={onDrop}
         onDragOver={onDragOver}
