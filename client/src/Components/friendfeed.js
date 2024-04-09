@@ -3,6 +3,8 @@ import { UserAuth } from "../Context/AuthContext";
 import "../styles/friendfeedpage.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
+import { Carousel } from 'react-responsive-carousel';
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 const FriendFeedComponent = ({ currentUserID }) => {
     const { user } = UserAuth();
@@ -37,21 +39,20 @@ const FriendFeedComponent = ({ currentUserID }) => {
     return (
         <div>
             <h1>Your Friend's Posts</h1>
-            <ul>
-
+            <Carousel useKeyboardArrows={true} className="post-container">
                 {friendPosts.length > 0 && friendPosts.map((post, index) => (
-                    <li key={index}>
-                        <div className="post-container">
-                            {<img src={`data:image/jpeg;base64,${post.imageURL}`} alt="post" className="post" />}
-                            <div className="save-button">
-                                <a href={`data:image/jpeg;base64,${post.imageURL}`} download="image.png"  >
-                                    <button> <FontAwesomeIcon icon={faDownload} /> </button>
-                                </a>
-                            </div>
+                    <div key={index} >
+                        <p className="post-title">Title: {post.title}</p>
+                        {<img src={`data:image/jpeg;base64,${post.imageURL}`} alt="post" className="post" />}
+                        <div className="save-button">
+                            <a href={`data:image/jpeg;base64,${post.imageURL}`} download="image.png"  >
+                                <button> <FontAwesomeIcon icon={faDownload} /> </button>
+                            </a>
                         </div>
-                    </li>
-                ))}
-            </ul>
+                    </div>
+                )
+                )}
+            </Carousel>
         </div>
     );
 };

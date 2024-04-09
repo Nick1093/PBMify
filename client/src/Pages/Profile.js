@@ -29,7 +29,7 @@ const Profile = () => {
             <Navbar></Navbar>
             <nav className="profile-nav">
                 <ul className="profile-list">
-                    <li onClick={() => setActiveComponent('posts')} className="posts" >My Posts</li>
+                    <li onClick={() => setActiveComponent('posts')} className="posts">My Posts</li>
                     <li onClick={() => setActiveComponent('settings')} >Settings</li>
                     <li onClick={() => setActiveComponent('viewFriends')} >View Friends</li>
                 </ul>

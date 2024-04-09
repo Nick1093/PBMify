@@ -29,11 +29,11 @@ const Navbar = () => {
               <Link to="/home">Home</Link>{" "}
             </li>
             <li>
-              <Link to="/friendfeed">Feed</Link>{" "}
-            </li>
-            <li>
               {" "}
               <Link to="/PBMify">PBMify</Link>
+            </li>
+            <li>
+              <Link to="/community">Community</Link>
             </li>
             <li className="userPfp">
               {" "}
