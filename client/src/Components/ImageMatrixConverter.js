@@ -62,6 +62,8 @@ const matrixToImageData = (mat, palette) => {
     }
   }
 
+  console.log("Matrix converted to image")
+
   return imageData;
 };
 
@@ -343,7 +345,7 @@ const ImageMatrixConverter = () => {
   //   return neighbors.some((n) => Math.abs(n - val) > threshold);
   // };
 
-  const displayProcessedMatrix = () => {
+/*  const displayProcessedMatrix = () => {
     const outputCanvas = canvasRef.current; // Using the same canvas to display the processed image
     if (outputCanvas && processedMatrix.length > 0 && colorPalette.length > 0) {
       const ctx = outputCanvas.getContext("2d");
@@ -351,7 +353,29 @@ const ImageMatrixConverter = () => {
       const imageData = matrixToImageData(processedMatrix, colorPalette);
       ctx.putImageData(imageData, 0, 0);
     }
+  };*/
+
+  const displayImageData = (imageData) => {
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      console.error("Canvas not found");
+      return;
+    }
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.putImageData(imageData, 0, 0);
   };
+
+  const processMatrix = () => {
+    if (!matrix.length || !colorPalette.length) {
+      console.error("Matrix or color palette is not set.");
+      return;
+    }
+    const imageData = matrixToImageData(matrix, colorPalette);
+    displayImageData(imageData);
+  };
+
+
 
   return (
     <>
@@ -383,6 +407,13 @@ const ImageMatrixConverter = () => {
             maxHeight: "500px",
           }}
         />
+
+        
+
+      </div>
+
+      <div>
+        <button id="Matrix to image" onClick={() => processMatrix()}>Proceed Matrix</button>
       </div>
       {/* Additional UI components to display matrix and color palette */}
     </>
