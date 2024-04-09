@@ -1,12 +1,10 @@
-
 import React, { useRef, useEffect, useState } from "react";
 import { extractColors } from "extract-colors";
 import NavBar from "../Components/navbar";
-import cloneDeep from 'lodash/cloneDeep';
+// import cloneDeep from "lodash/cloneDeep";
 import "../styles/UserInterface.css";
-import _ from 'lodash';
-
-
+// import _ from "lodash";
+import _ from "../Components/lodash.js";
 
 // Define the getNearest function that takes a color palette and a target color
 const getNearest = (palette, color) => {
@@ -50,8 +48,28 @@ const getNeighborhood = (mat, x, y, range) => {
   return values;
 };
 
+const neighborsSame = (mat, x, y) => {
+  let height = mat.length;
+  let width = mat[0].length;
+  let val = mat[y][x];
+  let xRel = [1, 0];
+  let yRel = [0, 1];
+
+  for (let i = 0; i < xRel.length; i++) {
+    let xx = x + xRel[i];
+    let yy = y + yRel[i];
+    if (xx >= 0 && xx < width && yy >= 0 && yy < height) {
+      if (mat[yy][xx] !== val) {
+        return false;
+      }
+    }
+  }
+  return true;
+};
+
 // Function to convert matrix back to ImageData
 const matrixToImageData = (mat, palette) => {
+  console.log("matrix to image data :", mat);
   const height = mat.length;
   const width = mat[0].length;
   const imageData = new ImageData(width, height);
@@ -60,6 +78,7 @@ const matrixToImageData = (mat, palette) => {
     for (let x = 0; x < width; x++) {
       const colorIndex = mat[y][x];
       const color = palette[colorIndex];
+      console.log(color);
       const dataIndex = (y * width + x) * 4;
 
       imageData.data[dataIndex] = color.red;
@@ -75,9 +94,10 @@ const matrixToImageData = (mat, palette) => {
 };
 
 const getRegion = (mat, x, y, cov) => {
-  const covered = cloneDeep(cov);
-  const region = {value: mat[y][x], x: [], y: []};
+  const region = { value: mat[y][x], x: [], y: [] };
   const value = mat[y][x];
+  // const covered = _.cloneDeep(cov);
+  const covered = cov.map((row) => row.slice());
 
   const queue = [[x, y]];
 
@@ -96,20 +116,20 @@ const getRegion = (mat, x, y, cov) => {
     }
   }
   return region;
-}
+};
 
 const getBelowValue = (mat, region) => {
   let x = region.x[0];
   let y = region.y[0];
   while (mat[y][x] === region.value) {
-      y++;
+    y++;
   }
   return mat[y][x];
-}
+};
 
 const removeRegion = (mat, region) => {
   // console.log("REGION REMOVED:", region);
-  let newValue
+  let newValue;
   if (region.y[0] > 0) {
     newValue = mat[region.y[0] - 1][region.x[0]]; // assumes first pixel in list is topmost then leftmost of region.
   } else {
@@ -118,52 +138,18 @@ const removeRegion = (mat, region) => {
   for (let i = 0; i < region.x.length; i++) {
     mat[region.y[i]][region.x[i]] = newValue;
   }
-}
-
-const coverRegion = (covered, region) => {
-  for(let i = 0; i < region.x.length; i++) {
-    const x = region.x[i];
-    const y = region.y[i];
-    if(covered[y] !== undefined && covered[y][x] !== undefined) {
-      covered[y][x] = true;
-    } else {
-      console.error('covered[y] or covered[x] is undefined!!');
-    }
-  }
 };
 
-const getLabelLocs = (mat) => {
-  console.log('Getting labellocs. This may take a while.');
-  let height = mat.length;
-  let width = mat[0].length;
-  let covered = Array(height).fill(null).map(() => _.fill(Array(width), false));  // using lodash fill
-  let labelLocs = [];
-  // let testCount = 0;
-
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      // console.log("getLabelLocs pixel loop iteration", testCount, "x:", x, "y:", y);
-      if (!covered[y][x]) {
-        let region = getRegion(mat, x, y, covered);
-        coverRegion(covered, region);
-        if (region.x.length > 100) {
-          // Threshold for size
-          let labelLoc = {x: region.x[0] + 10, y: region.y[0] + 10, value: region.value}; // For simplicity, choose the 10th pixel (adds some padding)
-          labelLocs.push(labelLoc);
-          // console.log("Successful location label:", labelLoc);
-        } else {
-          // console.log("Too small, removing region.")
-          removeRegion(mat, region);
-        }
-      } 
-      // else {
-      //   console.log('The pixel is already covered.');
-      // }
-      // testCount = testCount + 1;
+const coverRegion = (covered, region) => {
+  for (let i = 0; i < region.x.length; i++) {
+    const x = region.x[i];
+    const y = region.y[i];
+    if (covered[y] !== undefined && covered[y][x] !== undefined) {
+      covered[y][x] = true;
+    } else {
+      console.error("covered[y] or covered[x] is undefined!!");
     }
   }
-  // console.log("Returning labelLocs:", labelLocs);
-  return labelLocs;
 };
 
 const UserInterface = () => {
@@ -177,18 +163,16 @@ const UserInterface = () => {
   const processFile = async (file) => {
     if (file && file.type.startsWith("image/")) {
       const reader = new FileReader();
+
       reader.onload = async (e) => {
         const imgSrc = e.target.result;
         const img = new Image();
         img.onload = async () => {
           const canvas = canvasRef.current;
-          if (!canvas) {
-            console.error("Canvas not found");
-            return;
-          }
 
           canvas.width = img.width;
           canvas.height = img.height;
+          console.log("Canvas dimensions:", canvas.width, canvas.height);
           const ctx = canvas.getContext("2d");
           ctx.drawImage(img, 0, 0);
           setImageLoaded(true);
@@ -206,7 +190,7 @@ const UserInterface = () => {
           console.log("Color palette:", colors);
 
           // Make sure the palette is loaded before processing the image
-
+          // console.log(canvas.width, canvas.height);
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           console.log("Image data:", imageData);
 
@@ -217,17 +201,13 @@ const UserInterface = () => {
           const smoothedMatrix = smooth(rawMatrix);
           console.log("Smoothed matrix:", smoothedMatrix);
 
+          let labelLocs = getLabelLocs(smoothedMatrix);
+          console.log("Label locations:", labelLocs);
+          // Send the smoothed matrix to the worker
+          // workerRef.current.postMessage({ mat: smoothedMatrix });
+
           const outlinedMatrix = outline(smoothedMatrix);
           console.log("Outlined matrix:", outlinedMatrix);
-          setProcessedMatrix(outlinedMatrix);
-
-          let covered = Array.from({ length: rawMatrix.length }, () =>
-            Array(rawMatrix[0].length).fill(false)
-          );
-          let labelLocs = getLabelLocs(smoothedMatrix, covered);
-
-          // Now you can use `labelLocs` for further processing or visualization
-          console.log("labelLocs:", labelLocs);
           setProcessedMatrix(outlinedMatrix);
         };
         img.src = imgSrc;
@@ -296,75 +276,89 @@ const UserInterface = () => {
     return smoothedMat;
   };
 
-  const neighborsSame = (mat, x, y) => {
+  const getLabelLocs = (mat) => {
+    console.log("Getting labellocs. This may take a while.");
     let height = mat.length;
     let width = mat[0].length;
-    let val = mat[y][x];
-    let xRel = [1, 0];
-    let yRel = [0, 1];
-  
-    for (let i = 0; i < xRel.length; i++) {
-      let xx = x + xRel[i];
-      let yy = y + yRel[i];
-      if (xx >= 0 && xx < width && yy >= 0 && yy < height) {
-        if (mat[yy][xx] !== val) {
-          return false;
+    let labelLocs = [];
+    let covered = [];
+    for (let i = 0; i < height; i++) {
+      covered[i] = _.fill(Array(width), false);
+    }
+    // console.log("Covered:", covered);
+
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        if (!covered[y][x]) {
+          let region = getRegion(mat, x, y, covered);
+          coverRegion(covered, region);
+          // console.log("Finished covering the regions");
+          if (region.x.length > 100) {
+            // Threshold for size
+            let labelLoc = {
+              x: region.x[0] + 10,
+              y: region.y[0] + 10,
+              value: region.value,
+            }; // For simplicity, choose the 10th pixel (adds some padding)
+            labelLocs.push(labelLoc);
+            // console.log("Successful location label:", labelLoc);
+          } else {
+            // console.log("Too small, removing region.")
+            removeRegion(mat, region);
+          }
         }
       }
     }
-    return true;
-  }
-  
+    console.log("Returning labelLocs:", labelLocs);
+    return labelLocs;
+  };
+
   const outline = (mat) => {
     let height = mat.length;
     let width = mat[0].length;
     let line = Array.from({ length: height }, () => new Array(width).fill(0));
-  
+
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         line[y][x] = neighborsSame(mat, x, y) ? 0 : 1;
       }
     }
-  
+
     return line;
-    
-  }
-
-  const displayProcessedMatrix = () => {
-    const outputCanvas = canvasRef.current; // Using the same canvas to display the processed image
-    if (outputCanvas && processedMatrix.length > 0 && colorPalette.length > 0) {
-      const ctx = outputCanvas.getContext("2d");
-      ctx.clearRect(0, 0, outputCanvas.width, outputCanvas.height); // Clear the canvas before drawing new image
-      const imageData = matrixToImageData(processedMatrix, colorPalette);
-      ctx.putImageData(imageData, 0, 0);
-    }
   };
 
-  const displayImageData = (imageData) => {
+  const displaySmoothedImage = () => {
     const canvas = canvasRef.current;
-    if (!canvas) {
-      console.error("Canvas not found");
-      return;
-    }
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.putImageData(imageData, 0, 0);
-  };
-
-  const processMatrix = () => {
-    if (!matrix.length || !colorPalette.length) {
+    if (!matrix.length) {
       console.error("Matrix or color palette is not set.");
       return;
     }
     const imageData = matrixToImageData(matrix, colorPalette);
-    displayImageData(imageData);
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.putImageData(imageData, 0, 0);
   };
 
+  const displayOutlinedImage = () => {
+    const canvas = canvasRef.current;
+    if (!matrix.length) {
+      console.error("Matrix or color palette is not set.");
+      return;
+    }
 
+    const bw = [
+      { r: 255, g: 255, b: 255 },
+      { r: 0, g: 0, b: 0 },
+    ];
+
+    const outlinedData = matrixToImageData(processedMatrix, bw);
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.putImageData(outlinedData, 0, 0);
+  };
 
   return (
     <>
-
       <NavBar />
 
       <div
@@ -387,21 +381,39 @@ const UserInterface = () => {
           style={{ display: "none" }}
           accept="image/*"
         />
-        <canvas
-          ref={canvasRef}
-          style={{
-            display: imageLoaded ? "block" : "none",
-            maxWidth: "100%",
-            maxHeight: "500px",
-          }}
-        />
-
-        
-
+        <div
+          className="canvas-container"
+          ng-show="step == 'select' || step == 'process'"
+        >
+          <canvas
+            className="canvas"
+            ref={canvasRef}
+            style={{
+              display: imageLoaded ? "block" : "none",
+              maxWidth: "100%",
+              maxHeight: "500px",
+            }}
+          />
+        </div>
       </div>
 
       <div>
-        <button id="Matrix to image" onClick={() => processMatrix()}>Proceed Matrix</button>
+        <button
+          style={{ marginTop: "100px" }}
+          id="Matrix to image"
+          onClick={() => displaySmoothedImage()}
+        >
+          View Smoothed Matrix
+        </button>
+      </div>
+      <div>
+        <button
+          style={{ marginTop: "100px" }}
+          id="Matrix to image"
+          onClick={() => displayOutlinedImage()}
+        >
+          View Outlined Matrix
+        </button>
       </div>
       {/* Additional UI components to display matrix and color palette */}
     </>
@@ -409,4 +421,3 @@ const UserInterface = () => {
 };
 
 export default UserInterface;
-

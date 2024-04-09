@@ -1,9 +1,126 @@
 /**
- * VERY IMPORTANT COMMENT: A LOT OF THE FUNCTIONS HERE ARE REDUNDANT, I DON'T KNOW WHY THEY COPIED ONTO HERE BUT THE ONES THAT ARE 
+ * VERY IMPORTANT COMMENT: A LOT OF THE FUNCTIONS HERE ARE REDUNDANT, I DON'T KNOW WHY THEY COPIED ONTO HERE BUT THE ONES THAT ARE
  * RUNNING ARE IN USERINTERFACE.JS. EXAMPLES: getRegion, outline, neighborsSame, coveredRegion, etc.
  */
 import React, { useRef, useEffect, useState } from "react";
 import { extractColors } from "extract-colors";
+
+const getRegion = (mat, x, y, cov) => {
+  const covered = _.cloneDeep(cov);
+  const queue = [[x, y]];
+  const value = mat[y][x];
+  const region = { value, x: [], y: [] };
+
+  while (queue.length > 0) {
+    const [cx, cy] = queue.shift();
+
+    if (!covered[cy][cx] && mat[cy][cx] === value) {
+      region.x.push(cx);
+      region.y.push(cy);
+      covered[cy][cx] = true;
+
+      if (cx > 0) queue.push([cx - 1, cy]);
+      if (cx < mat[0].length - 1) queue.push([cx + 1, cy]);
+      if (cy > 0) queue.push([cx, cy - 1]);
+      if (cy < mat.length - 1) queue.push([cx, cy + 1]);
+    }
+  }
+  return region;
+};
+
+const coverRegion = (covered, region) => {
+  for (let i = 0; i < region.x.length; i++) {
+    covered[region.y[i]][region.x[i]] = true;
+  }
+};
+
+const sameCount = (mat, x, y, incX, incY) => {
+  const value = mat[y][x];
+  let count = 0;
+
+  while (
+    x >= 0 &&
+    x < mat[0].length &&
+    y >= 0 &&
+    y < mat.length &&
+    mat[y][x] === value
+  ) {
+    count++;
+    x += incX;
+    y += incY;
+  }
+  return count;
+};
+
+const getLabelLoc = (mat, region) => {
+  let bestI = 0;
+  let best = 0;
+
+  for (let i = 0; i < region.x.length; i++) {
+    const goodness =
+      sameCount(mat, region.x[i], region.y[i], -1, 0) *
+      sameCount(mat, region.x[i], region.y[i], 1, 0) *
+      sameCount(mat, region.x[i], region.y[i], 0, -1) *
+      sameCount(mat, region.x[i], region.y[i], 0, 1);
+
+    if (goodness > best) {
+      best = goodness;
+      bestI = i;
+    }
+  }
+  return {
+    value: region.value,
+    x: region.x[bestI],
+    y: region.y[bestI],
+  };
+};
+
+const getBelowValue = (mat, region) => {
+  let x = region.x[0];
+  let y = region.y[0] + 1;
+
+  while (y < mat.length && mat[y][x] === region.value) {
+    y++;
+  }
+  return mat[y] && mat[y][x];
+};
+
+const removeRegion = (mat, region) => {
+  const newValue =
+    region.y[0] > 0
+      ? mat[region.y[0] - 1][region.x[0]]
+      : getBelowValue(mat, region);
+
+  for (let i = 0; i < region.x.length; i++) {
+    mat[region.y[i]][region.x[i]] = newValue;
+  }
+};
+
+const getLabelLocs = (mat) => {
+  const width = mat[0].length;
+  const height = mat.length;
+  const covered = Array.from({ length: height }, () =>
+    Array(width).fill(false)
+  );
+  const labelLocs = [];
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      if (!covered[y][x]) {
+        const region = getRegion(mat, x, y, covered);
+        coverRegion(covered, region);
+
+        if (region.x.length > 100) {
+          const labelLoc = getLabelLoc(mat, region);
+          labelLocs.push(labelLoc);
+        } else {
+          removeRegion(mat, region);
+        }
+      }
+    }
+  }
+  return labelLocs;
+};
 
 // Define the getNearest function that takes a color palette and a target color
 const getNearest = (palette, color) => {
@@ -86,7 +203,7 @@ const neighborsSame = (mat, x, y) => {
     }
   }
   return true;
-}
+};
 
 const outline = (mat) => {
   let height = mat.length;
@@ -100,12 +217,11 @@ const outline = (mat) => {
   }
 
   return line;
-  
-}
+};
 
 const getRegion = (mat, x, y, cov) => {
-  const covered = cov.map(row => [...row]);
-  const region = {value: mat[y][x], x: [], y: []};
+  const covered = cov.map((row) => [...row]);
+  const region = { value: mat[y][x], x: [], y: [] };
   const value = mat[y][x];
 
   const queue = [[x, y]];
@@ -125,20 +241,20 @@ const getRegion = (mat, x, y, cov) => {
     }
   }
   return region;
-}
+};
 
 const getBelowValue = (mat, region) => {
   let x = region.x[0];
   let y = region.y[0];
   while (mat[y][x] === region.value) {
-      y++;
+    y++;
   }
   return mat[y][x];
-}
+};
 
 const removeRegion = (mat, region) => {
   console.log("REGION REMOVED:", region);
-  let newValue
+  let newValue;
   if (region.y[0] > 0) {
     newValue = mat[region.y[0] - 1][region.x[0]]; // assumes first pixel in list is topmost then leftmost of region.
   } else {
@@ -147,16 +263,16 @@ const removeRegion = (mat, region) => {
   for (let i = 0; i < region.x.length; i++) {
     mat[region.y[i]][region.x[i]] = newValue;
   }
-}
+};
 
 const coverRegion = (covered, region) => {
-  for(let i = 0; i < region.x.length; i++) {
+  for (let i = 0; i < region.x.length; i++) {
     const x = region.x[i];
     const y = region.y[i];
-    if(covered[y] !== undefined && covered[y][x] !== undefined) {
+    if (covered[y] !== undefined && covered[y][x] !== undefined) {
       covered[y][x] = true;
     } else {
-      console.error('covered[y] or covered[x] is undefined!!');
+      console.error("covered[y] or covered[x] is undefined!!");
     }
   }
 };
@@ -169,21 +285,32 @@ const getLabelLocs = (mat) => {
   let testCount = 0;
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      console.log("getLabelLocs pixel loop iteration", testCount, "x:", x, "y:", y);
+      console.log(
+        "getLabelLocs pixel loop iteration",
+        testCount,
+        "x:",
+        x,
+        "y:",
+        y
+      );
       if (!covered[y][x]) {
         let region = getRegion(mat, x, y, covered);
         coverRegion(covered, region);
         if (region.x.length > 100) {
           // Threshold for size
-          let labelLoc = {x: region.x[0] + 10, y: region.y[0] + 10, value: region.value}; // For simplicity, choose the 10th pixel (adds some padding)
+          let labelLoc = {
+            x: region.x[0] + 10,
+            y: region.y[0] + 10,
+            value: region.value,
+          }; // For simplicity, choose the 10th pixel (adds some padding)
           labelLocs.push(labelLoc);
           console.log("Successful location label:", labelLoc);
         } else {
-          console.log("Too small, removing region.")
+          console.log("Too small, removing region.");
           removeRegion(mat, region);
         }
       } else {
-        console.log('The pixel is already covered.');
+        console.log("The pixel is already covered.");
       }
       testCount = testCount + 1;
     }
