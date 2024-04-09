@@ -75,7 +75,9 @@ const matrixToImageData = (mat, palette) => {
 };
 
 const getRegion = (mat, x, y, cov) => {
-  const covered = cloneDeep(cov);
+  const covered = cov.map(row => row.slice());
+  console.log("in getRegion, covered matrix copied")
+  // const covered = cloneDeep(cov);
   const region = {value: mat[y][x], x: [], y: []};
   const value = mat[y][x];
 
@@ -170,9 +172,13 @@ const UserInterface = () => {
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
   const [matrix, setMatrix] = useState([]);
+  const [showUploadOptions, setShowUploadOptions] = useState(true);
+  const [outlinedMatrix, setOutlinedMatrix] = useState([]);
+
   const [processedMatrix, setProcessedMatrix] = useState([]);
   const [colorPalette, setColorPalette] = useState([]);
   const [imageLoaded, setImageLoaded] = useState(false);
+  
 
   const processFile = async (file) => {
     if (file && file.type.startsWith("image/")) {
@@ -356,18 +362,72 @@ const UserInterface = () => {
       console.error("Matrix or color palette is not set.");
       return;
     }
+
     const imageData = matrixToImageData(matrix, colorPalette);
     displayImageData(imageData);
     
-    const outlinePalette = [
-      { r: 0, g: 0, b: 0 }, // Black
-      { r: 255, g: 255, b: 255 } // White
-    ];
     
-
-    const outlineData = matrixToImageData(outline(matrix), outlinePalette);
-    displayImageData(outlineData);
   };
+
+  // const processMatrix = () => {
+  //   if (!matrix.length || !colorPalette.length) {
+  //     console.error("Matrix or color palette is not set.");
+  //     return;
+  //   }
+  
+  //   // Hide the upload options and the button
+  //   setShowUploadOptions(false);
+  
+  //   // Create a smoothed matrix
+  //   const smoothedMatrix = smooth(matrix);
+  //   const smoothedImageData = matrixToImageData(smoothedMatrix, colorPalette);
+  
+  //   // Create an outlined matrix
+  //   const outlinedMat = outline(matrix);
+  //   setOutlinedMatrix(outlinedMat); // Storing outlined matrix if needed for later
+  //   const outlineImageData = outlinedMatrixToImageData(outlinedMat);
+  
+  //   // Assuming you have a second canvas for the outlined matrix display
+  //   const canvas = canvasRef.current;
+  //   const outlineCanvas = document.createElement('canvas');
+  //   outlineCanvas.width = canvas.width;
+  //   outlineCanvas.height = canvas.height;
+  //   document.body.appendChild(outlineCanvas); // This will append the new canvas to the body. Adjust as necessary for your layout.
+  
+  //   // Display the smoothed matrix
+  //   if (canvas) {
+  //     const ctx = canvas.getContext('2d');
+  //     ctx.clearRect(0, 0, canvas.width, canvas.height);
+  //     ctx.putImageData(smoothedImageData, 0, 0);
+  //   }
+  
+  //   // Display the outlined matrix
+  //   if (outlineCanvas) {
+  //     const ctx = outlineCanvas.getContext('2d');
+  //     ctx.clearRect(0, 0, outlineCanvas.width, outlineCanvas.height);
+  //     ctx.putImageData(outlineImageData, 0, 0);
+  //   }
+  // };
+
+  const outlinedMatrixToImageData = (mat) => {
+    const width = mat[0].length;
+    const height = mat.length;
+    const imageData = new ImageData(width, height);
+  
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const index = (y * width + x) * 4;
+        const isEdge = mat[y][x] === 1;
+        imageData.data[index] = isEdge ? 0 : 255;     // Red (0 for edge, 255 for no edge)
+        imageData.data[index + 1] = isEdge ? 0 : 255; // Green
+        imageData.data[index + 2] = isEdge ? 0 : 255; // Blue
+        imageData.data[index + 3] = 255;              // Alpha (fully opaque)
+      }
+    }
+  
+    return imageData;
+  };
+  
 
 
 
