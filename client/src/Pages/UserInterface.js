@@ -235,6 +235,20 @@ const UserInterface = () => {
     processFile(file);
   };
 
+  const saveImage = async () => {
+    try {
+      console.log("Fetching your posts...");
+      console.log(user.uid);
+
+      const response = await fetch(
+        `http://localhost:8001/my-posts?userId=${user.uid}`
+      );
+      const data = await response.json();
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    }
+  };
+
   const imageDataToSimpMat = (imgData, palette) => {
     const width = imgData.width;
     const height = imgData.height;
@@ -424,6 +438,15 @@ const UserInterface = () => {
           onClick={() => displayOutlinedImage()}
         >
           View Outlined Matrix
+        </button>
+      </div>
+      <div>
+        <button
+          style={{ marginTop: "100px" }}
+          id=""
+          onClick={() => saveImage()}
+        >
+          Save Image!
         </button>
       </div>
       {/* Additional UI components to display matrix and color palette */}
