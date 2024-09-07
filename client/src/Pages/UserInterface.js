@@ -181,6 +181,21 @@ const UserInterface = () => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [labelLocs, setLabelLocs] = useState([]);
 
+  useEffect(() => {
+    // This function runs when the component mounts
+    console.log("Component mounted");
+  
+    // Cleanup function that runs when the component unmounts
+    return () => {
+      console.log("Cleaning up");
+      const paletteContainer = document.getElementById("colorPaletteContainer");
+      if (paletteContainer) {
+        paletteContainer.remove();
+      }
+    };
+  }, []); // The empty array means this effect runs only on mount and unmount
+  
+
   const processFile = async (file) => {
     if (file && file.type.startsWith("image/")) {
       const reader = new FileReader();
@@ -393,7 +408,8 @@ const UserInterface = () => {
     let gray = 128; // Example: mid-tone gray, adjust as needed
   
     ctx.font = "12px Georgia";
-    ctx.fillStyle = `rgb(${gray}, ${gray}, ${gray})`; // Template literal for easier readability
+    // ctx.fillStyle = `rgb(${gray}, ${gray}, ${gray})`; // Template literal for easier readability
+    ctx.fillStyle = "rgb(255, 0, 0)";
     labelLocs.forEach((labelLoc) => {
       ctx.fillText(labelLoc.value + 1, labelLoc.x - 3, labelLoc.y + 4);
     });
