@@ -6,7 +6,7 @@ const Landing = () => {
 
   return <>
     <Navbar></Navbar>
-    <h1>Log in to use PBMify! Or else.</h1>
+    <h1>Log in to use PBMify!</h1>
   </>;
 };
 
